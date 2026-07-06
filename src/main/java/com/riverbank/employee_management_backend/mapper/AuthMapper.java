@@ -1,5 +1,6 @@
 package com.riverbank.employee_management_backend.mapper;
 
+import com.riverbank.employee_management_backend.dto.AdminRegisterRequest;
 import com.riverbank.employee_management_backend.dto.RegisterRequest;
 import com.riverbank.employee_management_backend.entity.Employee;
 import com.riverbank.employee_management_backend.enums.Auth;
@@ -13,6 +14,14 @@ public class AuthMapper {
   private final PasswordEncoder passwordEncoder;
 
   public Employee register(RegisterRequest registerRequest) {
+    return Employee.builder()
+          .email(registerRequest.email())
+          .auth(Auth.DEVELOPER)
+          .password(passwordEncoder.encode(registerRequest.password()))
+          .build();
+  }
+
+  public Employee registerAdmin(AdminRegisterRequest registerRequest) {
     return Employee.builder()
           .email(registerRequest.email())
           .auth(Auth.DEVELOPER)

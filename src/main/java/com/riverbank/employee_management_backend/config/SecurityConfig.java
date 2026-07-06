@@ -38,7 +38,7 @@ public class SecurityConfig {
           .authorizeHttpRequests(auth -> auth
                 .requestMatchers(WHITE_LIST_URL).permitAll()
                 .requestMatchers(WHITE_LIST_ADMIN_URL)
-                .hasAnyRole("SUPER_ADMIN", "ADMIN")
+                .hasAnyRole("SUPERADMIN", "ADMIN")
                 .anyRequest().fullyAuthenticated()
           )
           .sessionManagement(session -> session
