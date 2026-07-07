@@ -1,0 +1,15 @@
+package com.riverbank.employee_management_backend.dto;
+
+import com.riverbank.employee_management_backend.enums.Role;
+
+import java.util.UUID;
+
+public record EmployeeResponse(
+      UUID id,
+      String firstName,
+      String lastName,
+      String email,
+      String phoneNumber,
+      Role role
+) {
+}

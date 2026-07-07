@@ -1,6 +1,6 @@
 package com.riverbank.employee_management_backend.dto;
 
-import com.riverbank.employee_management_backend.enums.Auth;
+import com.riverbank.employee_management_backend.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +16,6 @@ public record AdminRegisterRequest(
       String password,
 
       @NotNull(message = "Role is required")
-      Auth auth
+      Role role
 ) {
 }

@@ -26,6 +26,8 @@ public class SecurityConfig {
   };
   private static final String[] WHITE_LIST_ADMIN_URL = {
         "/api/v1/auth/admin/**",
+        "/api/v1/employees"
+
   };
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
   private final CorsConfigurationSource corsConfigurationSource;
