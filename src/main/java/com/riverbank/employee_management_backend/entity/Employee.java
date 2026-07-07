@@ -1,6 +1,6 @@
 package com.riverbank.employee_management_backend.entity;
 
-import com.riverbank.employee_management_backend.enums.Auth;
+import com.riverbank.employee_management_backend.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,11 +29,11 @@ public class Employee implements UserDetails {
   private String password;
 
   @Enumerated(EnumType.STRING)
-  private Auth auth;
+  private Role role;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority("ROLE_" + auth.name()));
+    return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
   }
 
   @Override

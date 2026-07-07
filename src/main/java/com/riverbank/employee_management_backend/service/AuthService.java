@@ -1,15 +1,20 @@
 package com.riverbank.employee_management_backend.service;
 
-import com.riverbank.employee_management_backend.dto.AdminRegisterRequest;
-import com.riverbank.employee_management_backend.dto.AuthResponse;
-import com.riverbank.employee_management_backend.dto.RegisterRequest;
-import com.riverbank.employee_management_backend.enums.Auth;
+import com.riverbank.employee_management_backend.dto.*;
+import com.riverbank.employee_management_backend.enums.Role;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.List;
+import java.util.UUID;
+
 public interface AuthService {
-  AuthResponse register(RegisterRequest registerRequest);
+  AuthResponse register(RegisterLoginRequest registerLoginRequest);
 
   AuthResponse registerAdmin(AdminRegisterRequest request, UserDetails currentUser);
 
-  void validateRoleAssignment(UserDetails currentUser, Auth auth);
+  void validateRoleAssignment(UserDetails currentUser, Role role);
+
+  List<EmployeeResponse> getEmployeesByIds(List<UUID> ids, EmployeeRequest employeeRequest);
+
+  AuthResponse login(RegisterLoginRequest registerLoginRequest);
 }
