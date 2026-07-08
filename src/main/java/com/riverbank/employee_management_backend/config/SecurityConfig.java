@@ -19,15 +19,18 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class SecurityConfig {
   // open routes
   private static final String[] WHITE_LIST_URL = {
-        "/api/v1/register",
-        "/api/v1/login",
+        "/api/v1/auth/register",
+        "/api/v1/auth/login",
         "/swagger-ui/**",
         "/v3/api-docs/**"
   };
+  private static final String[] WHITE_LIST_EMPLOYEE_URL = {
+        "/api/v1/auth/employee/**"
+  };
+
   private static final String[] WHITE_LIST_ADMIN_URL = {
         "/api/v1/auth/admin/**",
-        "/api/v1/employees"
-
+        "/api/v1/auth/employees/**"
   };
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
   private final CorsConfigurationSource corsConfigurationSource;
@@ -39,6 +42,8 @@ public class SecurityConfig {
           .csrf(AbstractHttpConfigurer::disable)
           .authorizeHttpRequests(auth -> auth
                 .requestMatchers(WHITE_LIST_URL).permitAll()
+                .requestMatchers(WHITE_LIST_EMPLOYEE_URL)
+                .hasAnyRole("DEVELOPER")
                 .requestMatchers(WHITE_LIST_ADMIN_URL)
                 .hasAnyRole("SUPERADMIN", "ADMIN")
                 .anyRequest().fullyAuthenticated()
