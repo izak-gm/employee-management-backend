@@ -5,7 +5,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -45,11 +44,9 @@ public class JwtService {
   //  generate  a token
   public String generateToken(Employee employee) {
     Map<String, Object> claims = new HashMap<>();
-    claims.put("id", employee.getId());
+    claims.put("id", employee.getId().toString());
     claims.put("email", employee.getEmail());
-    claims.put("roles", employee.getAuthorities().stream()
-          .map(GrantedAuthority::getAuthority)
-          .toList());
+    claims.put("role", employee.getRole().name());
 
     return buildToken(claims, employee.getEmail());
   }
