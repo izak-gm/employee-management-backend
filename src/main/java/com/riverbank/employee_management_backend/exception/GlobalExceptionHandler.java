@@ -29,6 +29,13 @@ public class GlobalExceptionHandler {
     return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
   }
 
+  @ExceptionHandler(UserAlreadyExistsException.class)
+  public ResponseEntity<ErrorResponse> handleUserExists(
+        UserAlreadyExistsException ex, HttpServletRequest request) {
+    log.warn("Registration attempt with existing email on {}: {}", request.getRequestURI(), ex.getMessage());
+    return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
+  }
+  
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<ErrorResponse> handleBadCredentials(
         BadCredentialsException ex, HttpServletRequest request) {
