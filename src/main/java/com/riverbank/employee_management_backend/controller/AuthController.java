@@ -30,7 +30,7 @@ public class AuthController {
     return ResponseEntity.ok(authService.register(registerLoginRequest));
   }
 
-  //  Admin privilege to create a admin/superAdmin
+  //  Admin privilege to create an admin/superAdmin
   @PostMapping("/admin/register")
   @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
   public ResponseEntity<AuthResponse> registerAdmins(
@@ -46,7 +46,7 @@ public class AuthController {
     return ResponseEntity.ok(authService.login(registerLoginRequest));
   }
 
-  @GetMapping("/employees/{employeeId}")
+  @GetMapping("/employee/{employeeId}")
   public EmployeeResponse getEmployeeById(@PathVariable("employeeId") UUID id,
                                           HttpServletRequest request) {
     return authService.getEmployeeById(id);

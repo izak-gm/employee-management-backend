@@ -40,9 +40,11 @@ public class AuthServiceImpl implements AuthService {
   private final AuthenticationManager authenticationManager;
   private final PasswordEncoder passwordEncoder; // inject this
 
-
   @Override
   public AuthResponse register(RegisterLoginRequest registerLoginRequest) {
+    if (employeeRepository.existsByEmail(registerLoginRequest.email())) {
+      throw new UserAlreadyExistsException("User already exists");
+    }
     Employee employee = employeeRepository.save(authMapper.register(registerLoginRequest));
     var jwtToken = jwtService.generateToken(employee);
     return AuthResponse.builder()
@@ -53,6 +55,9 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public AuthResponse registerAdmin(AdminRegisterRequest request, UserDetails currentUser) {
     validateRoleAssignment(currentUser, request.role());
+    if (employeeRepository.existsByEmail(request.email())) {
+      throw new UserAlreadyExistsException("User already exists");
+    }
     Employee employee = employeeRepository.save(authMapper.registerAdmin(request));
     var jwtToken = jwtService.generateToken(employee);
     return AuthResponse.builder().token(jwtToken).build();
