@@ -4,6 +4,7 @@ import com.riverbank.employee_management_backend.dto.*;
 import com.riverbank.employee_management_backend.entity.Employee;
 import com.riverbank.employee_management_backend.enums.Role;
 import com.riverbank.employee_management_backend.exception.EmployeeNotFoundException;
+import com.riverbank.employee_management_backend.exception.UserAlreadyExistsException;
 import com.riverbank.employee_management_backend.mapper.AuthMapper;
 import com.riverbank.employee_management_backend.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
@@ -151,18 +152,25 @@ public class AuthServiceImpl implements AuthService {
     Employee employee = employeeRepository.findById(id)
           .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));
 
-    employee.setFirstName(updateEmployee.firstName());
-    employee.setLastName(updateEmployee.lastName());
-    employee.setEmail(updateEmployee.email());
-    employee.setPhoneNumber(updateEmployee.phoneNumber());
-
+    if (updateEmployee.firstName() != null && !updateEmployee.firstName().isBlank()) {
+      employee.setFirstName(updateEmployee.firstName());
+    }
+    if (updateEmployee.lastName() != null && !updateEmployee.lastName().isBlank()) {
+      employee.setLastName(updateEmployee.lastName());
+    }
+    if (updateEmployee.email() != null && !updateEmployee.email().isBlank()) {
+      employee.setEmail(updateEmployee.email());
+    }
+    if (updateEmployee.phoneNumber() != null && !updateEmployee.phoneNumber().isBlank()) {
+      employee.setPhoneNumber(updateEmployee.phoneNumber());
+    }
     if (updateEmployee.password() != null && !updateEmployee.password().isBlank()) {
       employee.setPassword(passwordEncoder.encode(updateEmployee.password()));
     }
 
     return employeeRepository.save(employee);
   }
-
+  
   @Override
   public void deleteEmployee(UUID id) {
     Employee employee = employeeRepository.findById(id)

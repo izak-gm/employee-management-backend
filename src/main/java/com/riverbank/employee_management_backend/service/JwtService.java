@@ -61,7 +61,7 @@ public class JwtService {
           .claims(claims)
           .subject(subject)
           .issuedAt(new Date(now))
-          .expiration(new Date(now + TimeUnit.DAYS.toMillis(1))) // one day expiration period
+          .expiration(new Date(now + TimeUnit.DAYS.toMillis(7))) // one day expiration period
           .signWith(getSignKey())
           .compact();
   }
