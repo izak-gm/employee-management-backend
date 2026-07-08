@@ -16,7 +16,7 @@ public class AuthMapper {
   public Employee register(RegisterLoginRequest registerLoginRequest) {
     return Employee.builder()
           .email(registerLoginRequest.email())
-          .role(Role.DEVELOPER)
+          .role(Role.EMPLOYEE)
           .password(passwordEncoder.encode(registerLoginRequest.password()))
           .build();
   }
@@ -24,7 +24,6 @@ public class AuthMapper {
   public Employee registerAdmin(AdminRegisterRequest registerRequest) {
     return Employee.builder()
           .email(registerRequest.email())
-          .role(Role.DEVELOPER)
           .password(passwordEncoder.encode(registerRequest.password()))
           .build();
   }
