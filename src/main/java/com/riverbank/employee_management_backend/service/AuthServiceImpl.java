@@ -31,8 +31,8 @@ import static com.riverbank.employee_management_backend.util.StringUtils.safe;
 public class AuthServiceImpl implements AuthService {
 
   private static final Map<Role, Set<Role>> Auth_HIERARCHY = Map.of(
-        Role.SUPERADMIN, Set.of(Role.ADMIN, Role.SUPERADMIN, Role.DEVELOPER),
-        Role.ADMIN, Set.of(Role.DEVELOPER)
+        Role.SUPERADMIN, Set.of(Role.ADMIN, Role.SUPERADMIN, Role.EMPLOYEE),
+        Role.ADMIN, Set.of(Role.EMPLOYEE)
   );
 
   private final EmployeeRepository employeeRepository;
@@ -170,7 +170,7 @@ public class AuthServiceImpl implements AuthService {
 
     return employeeRepository.save(employee);
   }
-  
+
   @Override
   public void deleteEmployee(UUID id) {
     Employee employee = employeeRepository.findById(id)
