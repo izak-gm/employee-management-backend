@@ -178,4 +178,19 @@ public class AuthServiceImpl implements AuthService {
 
     employeeRepository.delete(employee);
   }
+
+  @Override
+  public Employee updateOwnProfile(String email, UpdateEmployee updateEmployee) {
+    Employee employee = employeeRepository.findByEmail(email)
+          .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    return updateProfile(employee.getId(), updateEmployee); // reuse your existing update logic
+  }
+
+  @Override
+  public EmployeeResponse getEmployeeByEmail(String email) {
+    Employee employee = employeeRepository.findByEmail(email)
+          .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    return authMapper.toEmployeeResponse(employee); // use whatever mapper method you already use in getEmployeeById
+  }
+
 }

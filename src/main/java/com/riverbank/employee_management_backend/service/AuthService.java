@@ -24,4 +24,8 @@ public interface AuthService {
   Employee updateProfile(UUID id, UpdateEmployee updateEmployee);
 
   void deleteEmployee(UUID id);
+
+  Employee updateOwnProfile(String username, UpdateEmployee updateEmployee);
+
+  EmployeeResponse getEmployeeByEmail(String username);
 }
