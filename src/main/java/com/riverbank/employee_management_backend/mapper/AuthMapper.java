@@ -1,10 +1,7 @@
 package com.riverbank.employee_management_backend.mapper;
 
-import com.riverbank.employee_management_backend.dto.AdminRegisterRequest;
 import com.riverbank.employee_management_backend.dto.EmployeeResponse;
-import com.riverbank.employee_management_backend.dto.RegisterLoginRequest;
 import com.riverbank.employee_management_backend.entity.Employee;
-import com.riverbank.employee_management_backend.enums.Role;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,21 +10,6 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class AuthMapper {
   private final PasswordEncoder passwordEncoder;
-
-  public Employee register(RegisterLoginRequest registerLoginRequest) {
-    return Employee.builder()
-          .email(registerLoginRequest.email())
-          .role(Role.EMPLOYEE)
-          .password(passwordEncoder.encode(registerLoginRequest.password()))
-          .build();
-  }
-
-  public Employee registerAdmin(AdminRegisterRequest registerRequest) {
-    return Employee.builder()
-          .email(registerRequest.email())
-          .password(passwordEncoder.encode(registerRequest.password()))
-          .build();
-  }
 
   public EmployeeResponse toEmployeeResponse(Employee employee) {
     return new EmployeeResponse(

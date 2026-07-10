@@ -1,13 +1,22 @@
-package com.riverbank.employee_management_backend.service;
+package com.riverbank.employee_management_backend.service.implementation;
 
 import com.riverbank.employee_management_backend.dto.*;
 import com.riverbank.employee_management_backend.entity.Employee;
+import com.riverbank.employee_management_backend.entity.InviteToken;
+import com.riverbank.employee_management_backend.enums.EmployeeStatus;
 import com.riverbank.employee_management_backend.enums.Role;
 import com.riverbank.employee_management_backend.exception.EmployeeNotFoundException;
 import com.riverbank.employee_management_backend.exception.UserAlreadyExistsException;
 import com.riverbank.employee_management_backend.mapper.AuthMapper;
 import com.riverbank.employee_management_backend.repository.EmployeeRepository;
+import com.riverbank.employee_management_backend.repository.InviteTokenRepository;
+import com.riverbank.employee_management_backend.service.auth.AuthService;
+import com.riverbank.employee_management_backend.service.email.EmailService;
+import com.riverbank.employee_management_backend.service.jwt.JwtService;
+import com.riverbank.employee_management_backend.util.EmployeeUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -17,7 +26,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +40,7 @@ import static com.riverbank.employee_management_backend.util.StringUtils.safe;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
   private static final Map<Role, Set<Role>> Auth_HIERARCHY = Map.of(
@@ -39,30 +52,15 @@ public class AuthServiceImpl implements AuthService {
   private final AuthMapper authMapper;
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
-  private final PasswordEncoder passwordEncoder; // inject this
+  private final PasswordEncoder passwordEncoder;
+  private final InviteTokenRepository inviteTokenRepository;
+  private final EmailService emailService;
+  private final EmployeeUtils employeeUtils;
 
-  @Override
-  public AuthResponse register(RegisterLoginRequest registerLoginRequest) {
-    if (employeeRepository.existsByEmail(registerLoginRequest.email())) {
-      throw new UserAlreadyExistsException("User already exists");
-    }
-    Employee employee = employeeRepository.save(authMapper.register(registerLoginRequest));
-    var jwtToken = jwtService.generateToken(employee);
-    return AuthResponse.builder()
-          .token(jwtToken)
-          .build();
-  }
-
-  @Override
-  public AuthResponse registerAdmin(AdminRegisterRequest request, UserDetails currentUser) {
-    validateRoleAssignment(currentUser, request.role());
-    if (employeeRepository.existsByEmail(request.email())) {
-      throw new UserAlreadyExistsException("User already exists");
-    }
-    Employee employee = employeeRepository.save(authMapper.registerAdmin(request));
-    var jwtToken = jwtService.generateToken(employee);
-    return AuthResponse.builder().token(jwtToken).build();
-  }
+  @Value("${app.invite-token-expiry-hours:48}")
+  private int inviteTokenExpiryHours;
+  @Value("${app.reset-token-expiry-hours:1}")
+  private int resetTokenExpiryHours;
 
   @Override
   public void validateRoleAssignment(UserDetails currentUser, Role requestedRole) {
@@ -82,19 +80,110 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public AuthResponse login(RegisterLoginRequest registerLoginRequest) {
+  public AuthResponse login(LoginRequest loginRequest) {
     authenticationManager.authenticate(
           new UsernamePasswordAuthenticationToken(
-                registerLoginRequest.email(),
-                registerLoginRequest.password()
+                loginRequest.email(),
+                loginRequest.password()
           )
     );
-    var employee = employeeRepository.findByEmail(registerLoginRequest.email())
+    var employee = employeeRepository.findByEmail(loginRequest.email())
           .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     var jwtToken = jwtService.generateToken(employee);
     return AuthResponse.builder()
           .token(jwtToken)
           .build();
+  }
+
+  // --- Employee creation (Admin/SuperAdmin only) ---
+
+  @Transactional
+  public EmployeeResponse createEmployee(CreateEmployeeRequest request) {
+    if (employeeRepository.existsByEmail(request.email())) {
+      throw new UserAlreadyExistsException("An employee with this email already exists");
+    }
+
+    Employee employee = Employee.builder()
+          .firstName(request.firstName())
+          .lastName(request.lastName())
+          .email(request.email())
+          .phoneNumber(request.phoneNumber())
+          .role(request.role())
+          .status(EmployeeStatus.INVITED)
+          .password("") // set later via invite link
+          .build();
+
+    employee = employeeRepository.save(employee);
+
+    String token = UUID.randomUUID().toString();
+    InviteToken inviteToken = InviteToken.builder()
+          .token(token)
+          .employee(employee)
+          .expiresAt(Instant.now().plus(inviteTokenExpiryHours, ChronoUnit.HOURS))
+          .used(false)
+          .build();
+    inviteTokenRepository.save(inviteToken);
+
+    emailService.sendInviteEmail(employee.getEmail(), employee.getFirstName(), token);
+
+    return employeeUtils.toEmployeeResponse(employee);
+  }
+
+  // --- Set password via invite link ---
+
+  @Transactional
+  public void setPassword(SetPasswordRequest request) {
+    InviteToken inviteToken = inviteTokenRepository.findByToken(request.token())
+          .orElseThrow(() -> new RuntimeException("Invalid or expired invite link"));
+
+    if (inviteToken.isUsed()) throw new RuntimeException("This invite link has already been used");
+    if (inviteToken.getExpiresAt().isBefore(Instant.now())) throw new RuntimeException("This invite link has expired");
+
+    Employee employee = inviteToken.getEmployee();
+    employee.setPassword(passwordEncoder.encode(request.password()));
+    employee.setStatus(EmployeeStatus.ACTIVE);
+    employeeRepository.save(employee);
+
+    inviteToken.setUsed(true);
+    inviteTokenRepository.save(inviteToken);
+  }
+
+  // --- Forgot password ---
+
+  @Transactional
+  public void requestPasswordReset(ForgotPasswordRequest request) {
+    Employee employee = employeeRepository.findByEmail(request.email())
+          .orElseThrow(() -> new UsernameNotFoundException("No account found with that email"));
+
+    // Reuse invite token table for reset tokens (same mechanism, different email)
+    inviteTokenRepository.deleteByEmployeeId(employee.getId());
+
+    String token = UUID.randomUUID().toString();
+    InviteToken resetToken = InviteToken.builder()
+          .token(token)
+          .employee(employee)
+          .expiresAt(Instant.now().plus(resetTokenExpiryHours, ChronoUnit.HOURS))
+          .used(false)
+          .build();
+    inviteTokenRepository.save(resetToken);
+
+    emailService.sendPasswordResetEmail(employee.getEmail(), employee.getFirstName(), token);
+  }
+
+  @Transactional
+  public void resetPassword(ResetPasswordRequest request) {
+    InviteToken resetToken = inviteTokenRepository.findByToken(request.token())
+          .orElseThrow(() -> new RuntimeException("Invalid or expired reset link"));
+
+    if (resetToken.isUsed()) throw new RuntimeException("This reset link has already been used");
+    if (resetToken.getExpiresAt().isBefore(Instant.now())) throw new RuntimeException("This reset link has expired");
+
+    Employee employee = resetToken.getEmployee();
+    employee.setPassword(passwordEncoder.encode(request.password()));
+    employeeRepository.save(employee);
+
+    resetToken.setUsed(true);
+    inviteTokenRepository.save(resetToken);
   }
 
 
@@ -164,10 +253,6 @@ public class AuthServiceImpl implements AuthService {
     if (updateEmployee.phoneNumber() != null && !updateEmployee.phoneNumber().isBlank()) {
       employee.setPhoneNumber(updateEmployee.phoneNumber());
     }
-    if (updateEmployee.password() != null && !updateEmployee.password().isBlank()) {
-      employee.setPassword(passwordEncoder.encode(updateEmployee.password()));
-    }
-
     return employeeRepository.save(employee);
   }
 
@@ -183,14 +268,14 @@ public class AuthServiceImpl implements AuthService {
   public Employee updateOwnProfile(String email, UpdateEmployee updateEmployee) {
     Employee employee = employeeRepository.findByEmail(email)
           .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    return updateProfile(employee.getId(), updateEmployee); // reuse your existing update logic
+    return updateProfile(employee.getId(), updateEmployee);
   }
 
   @Override
   public EmployeeResponse getEmployeeByEmail(String email) {
     Employee employee = employeeRepository.findByEmail(email)
           .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    return authMapper.toEmployeeResponse(employee); // use whatever mapper method you already use in getEmployeeById
+    return authMapper.toEmployeeResponse(employee);
   }
 
 }

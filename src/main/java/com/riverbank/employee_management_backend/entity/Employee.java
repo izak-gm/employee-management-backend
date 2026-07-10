@@ -1,5 +1,6 @@
 package com.riverbank.employee_management_backend.entity;
 
+import com.riverbank.employee_management_backend.enums.EmployeeStatus;
 import com.riverbank.employee_management_backend.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,6 +31,16 @@ public class Employee implements UserDetails {
 
   @Enumerated(EnumType.STRING)
   private Role role;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private EmployeeStatus status;
+
+  @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private InviteToken inviteToken;
+
+  @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+  private List<Leave> leaves;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
