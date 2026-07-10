@@ -1,6 +1,7 @@
 package com.riverbank.employee_management_backend.controller;
 
-import com.riverbank.employee_management_backend.dto.auth.EmployeeResponse;
+import com.riverbank.employee_management_backend.dto.*;
+import com.riverbank.employee_management_backend.dto.auth.*;
 import com.riverbank.employee_management_backend.dto.employee.*;
 
 import com.riverbank.employee_management_backend.service.employee.EmployeeService;
@@ -50,6 +51,22 @@ public class EmployeeController {
     return ResponseEntity.ok(employeeService.getPendingLeaves());
   }
 
+  @GetMapping("/leaves/notifications")
+  public ResponseEntity<List<LeaveResponse>> myNotifications(@AuthenticationPrincipal UserDetails user) {
+    return ResponseEntity.ok(employeeService.getPendingCoverActionsForMe(user.getUsername()));
+  }
+// --- Active employees (for cover person selector) ---
+
+  @GetMapping("/employees/active")
+  public ResponseEntity<List<EmployeeResponse>> getActiveEmployees() {
+    return ResponseEntity.ok(employeeService.getActiveEmployees());
+  }
+
+  @GetMapping("/leaves/balance")
+  public ResponseEntity<List<LeaveBalanceResponse>> myBalance(@AuthenticationPrincipal UserDetails user) {
+    return ResponseEntity.ok(employeeService.getMyLeaveBalances(user.getUsername()));
+  }
+
   @PutMapping("/leaves/{leaveId}/action")
   @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
   public ResponseEntity<LeaveResponse> actionLeave(
@@ -59,11 +76,28 @@ public class EmployeeController {
     return ResponseEntity.ok(employeeService.actionLeave(leaveId, request, currentUser.getUsername()));
   }
 
-// --- Active employees (for cover person selector) ---
-
-  @GetMapping("/employees/active")
-  public ResponseEntity<List<EmployeeResponse>> getActiveEmployees() {
-    return ResponseEntity.ok(employeeService.getActiveEmployees());
+  @PutMapping("/leaves/{leaveId}")
+  public ResponseEntity<LeaveResponse> updateLeave(@PathVariable UUID leaveId,
+                                                   @Valid @RequestBody LeaveRequest request, @AuthenticationPrincipal UserDetails user) {
+    return ResponseEntity.ok(employeeService.updateLeave(leaveId, user.getUsername(), request));
   }
 
+  @PutMapping("/leaves/{leaveId}/cover-action")
+  public ResponseEntity<LeaveResponse> coverAction(@PathVariable UUID leaveId,
+                                                   @Valid @RequestBody CoverActionRequest request, @AuthenticationPrincipal UserDetails user) {
+    return ResponseEntity.ok(employeeService.actionAsCover(leaveId, request, user.getUsername()));
+  }
+
+  @DeleteMapping("/leaves/{leaveId}")
+  public ResponseEntity<MessageResponse> deleteLeave(@PathVariable UUID leaveId,
+                                                     @AuthenticationPrincipal UserDetails user) {
+    employeeService.deleteLeave(leaveId, user.getUsername());
+    return ResponseEntity.ok(new MessageResponse("Leave deleted"));
+  }
+
+
+  @DeleteMapping("/leaves/{leaveId}/withdraw")
+  public ResponseEntity<LeaveResponse> withdrawLeave(@PathVariable UUID leaveId, @AuthenticationPrincipal UserDetails user) {
+    return ResponseEntity.ok(employeeService.withdrawLeave(leaveId, user.getUsername()));
+  }
 }

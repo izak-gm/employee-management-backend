@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
     log.warn("Registration attempt with existing email on {}: {}", request.getRequestURI(), ex.getMessage());
     return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
   }
-  
+
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<ErrorResponse> handleBadCredentials(
         BadCredentialsException ex, HttpServletRequest request) {
@@ -94,6 +94,19 @@ public class GlobalExceptionHandler {
         RuntimeException ex, HttpServletRequest request) {
     log.error("Unhandled exception on {}", request.getRequestURI(), ex);
     return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", request);
+  }
+
+  @ExceptionHandler(LeaveActionNotAllowedException.class)
+  public ResponseEntity<ErrorResponse> handleLeaveActionNotAllowed(
+        LeaveActionNotAllowedException ex, HttpServletRequest request) {
+    ErrorResponse error = ErrorResponse.builder()
+          .timestamp(Instant.now())
+          .status(HttpStatus.CONFLICT.value())
+          .error(HttpStatus.CONFLICT.getReasonPhrase())
+          .message(ex.getMessage())
+          .path(request.getRequestURI())
+          .build();
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
   }
 
   private ResponseEntity<ErrorResponse> buildResponse(

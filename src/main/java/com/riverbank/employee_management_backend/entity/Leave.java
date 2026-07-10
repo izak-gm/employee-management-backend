@@ -57,7 +57,7 @@ public class Leave {
   protected void onCreate() {
     createdAt = Instant.now();
     updatedAt = Instant.now();
-    if (status == null) status = LeaveStatus.PENDING;
+    if (status == null) status = LeaveStatus.PENDING_COVER;
   }
 
   @PreUpdate
