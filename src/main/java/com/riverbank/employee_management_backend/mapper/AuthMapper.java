@@ -1,6 +1,6 @@
 package com.riverbank.employee_management_backend.mapper;
 
-import com.riverbank.employee_management_backend.dto.EmployeeResponse;
+import com.riverbank.employee_management_backend.dto.auth.EmployeeResponse;
 import com.riverbank.employee_management_backend.entity.Employee;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
