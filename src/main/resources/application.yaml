@@ -48,7 +48,7 @@ spring:
 app:
   frontend-url: http://localhost:5173   # used to build invite/reset links
   invite-token-expiry-hours: 48
-  reset-token-expiry-hours: 1 and
+  reset-token-expiry-hours: 1
 #springdoc:
 #  swagger-ui:
 #    operations-sorter: method

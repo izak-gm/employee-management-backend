@@ -1,6 +1,6 @@
 package com.riverbank.employee_management_backend.controller;
 
-import com.riverbank.employee_management_backend.dto.DashboardStatsResponse;
+import com.riverbank.employee_management_backend.dto.dashboard.DashboardStatsResponse;
 import com.riverbank.employee_management_backend.service.employee.EmployeeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

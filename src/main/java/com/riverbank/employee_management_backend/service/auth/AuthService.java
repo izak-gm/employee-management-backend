@@ -1,6 +1,9 @@
 package com.riverbank.employee_management_backend.service.auth;
 
-import com.riverbank.employee_management_backend.dto.*;
+import com.riverbank.employee_management_backend.dto.auth.*;
+import com.riverbank.employee_management_backend.dto.password.ForgotPasswordRequest;
+import com.riverbank.employee_management_backend.dto.password.ResetPasswordRequest;
+import com.riverbank.employee_management_backend.dto.password.SetPasswordRequest;
 import com.riverbank.employee_management_backend.entity.Employee;
 import com.riverbank.employee_management_backend.enums.Role;
 import jakarta.validation.Valid;

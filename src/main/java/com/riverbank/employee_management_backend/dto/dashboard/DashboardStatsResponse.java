@@ -1,4 +1,4 @@
-package com.riverbank.employee_management_backend.dto;
+package com.riverbank.employee_management_backend.dto.dashboard;
 
 public record DashboardStatsResponse(
       long totalEmployees,

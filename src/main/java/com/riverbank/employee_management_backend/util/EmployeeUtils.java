@@ -1,6 +1,6 @@
 package com.riverbank.employee_management_backend.util;
 
-import com.riverbank.employee_management_backend.dto.EmployeeResponse;
+import com.riverbank.employee_management_backend.dto.auth.EmployeeResponse;
 import com.riverbank.employee_management_backend.entity.Employee;
 import org.springframework.stereotype.Component;
 

@@ -1,4 +1,4 @@
-package com.riverbank.employee_management_backend.dto;
+package com.riverbank.employee_management_backend.dto.auth;
 
 import com.riverbank.employee_management_backend.enums.Role;
 import jakarta.validation.constraints.Email;

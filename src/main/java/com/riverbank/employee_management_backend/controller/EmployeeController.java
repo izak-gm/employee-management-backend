@@ -1,6 +1,8 @@
 package com.riverbank.employee_management_backend.controller;
 
-import com.riverbank.employee_management_backend.dto.*;
+import com.riverbank.employee_management_backend.dto.auth.EmployeeResponse;
+import com.riverbank.employee_management_backend.dto.employee.*;
+
 import com.riverbank.employee_management_backend.service.employee.EmployeeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -64,11 +66,4 @@ public class EmployeeController {
     return ResponseEntity.ok(employeeService.getActiveEmployees());
   }
 
-// --- Dashboard stats ---
-
-  @GetMapping("/dashboard/stats")
-  @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
-  public ResponseEntity<DashboardStatsResponse> getDashboardStats() {
-    return ResponseEntity.ok(employeeService.getDashboardStats());
-  }
 }
