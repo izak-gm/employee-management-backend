@@ -1,6 +1,6 @@
 package com.riverbank.employee_management_backend.config;
 
-import com.riverbank.employee_management_backend.service.JwtService;
+import com.riverbank.employee_management_backend.service.jwt.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,7 +38,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     jwt = authHeader.substring(7);
-    log.info("JWT :{}", jwt);
     userEmail = jwtService.extractUsername(jwt);
 
     if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {

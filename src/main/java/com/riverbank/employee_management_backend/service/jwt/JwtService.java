@@ -1,4 +1,4 @@
-package com.riverbank.employee_management_backend.service;
+package com.riverbank.employee_management_backend.service.jwt;
 
 import com.riverbank.employee_management_backend.entity.Employee;
 import io.jsonwebtoken.Claims;

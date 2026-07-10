@@ -16,12 +16,12 @@ spring:
     pool-name: AuthHikariCp
 
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         default_schema: public
 
   flyway:
@@ -30,5 +30,28 @@ spring:
     schemas: public
     baseline-version: 0
     validate-on-migrate: true
+
+
+
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: ${MAILTRAP_USERNAME}
+    password: ${MAILTRAP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+app:
+  frontend-url: http://localhost:5173   # used to build invite/reset links
+  invite-token-expiry-hours: 48
+  reset-token-expiry-hours: 1
+#springdoc:
+#  swagger-ui:
+#    operations-sorter: method
+#    tags-sorter: alpha
 server:
   port: 8080
