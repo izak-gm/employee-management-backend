@@ -18,7 +18,7 @@ public class AuthMapper {
           employee.getLastName(),
           employee.getEmail(),
           employee.getPhoneNumber(),
-          employee.getRole()
-    );
+          employee.getRole(),
+          employee.getGender());
   }
 }

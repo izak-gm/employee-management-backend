@@ -2,6 +2,7 @@ package com.riverbank.employee_management_backend.entity;
 
 import com.riverbank.employee_management_backend.enums.EmployeeStatus;
 import com.riverbank.employee_management_backend.enums.Role;
+import com.riverbank.employee_management_backend.enus.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,6 +28,8 @@ public class Employee implements UserDetails {
   private String lastName;
   private String email;
   private String phoneNumber;
+  @Enumerated(EnumType.STRING)
+  private Gender gender;
   private String password;
 
   @Enumerated(EnumType.STRING)
