@@ -10,6 +10,6 @@ public record EmployeeResponse(
       String lastName,
       String email,
       String phoneNumber,
-      Role role
-) {
+      Role role,
+      com.riverbank.employee_management_backend.enus.Gender gender) {
 }

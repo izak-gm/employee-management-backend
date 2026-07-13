@@ -112,6 +112,7 @@ public class AuthServiceImpl implements AuthService {
           .email(request.email())
           .phoneNumber(request.phoneNumber())
           .role(request.role())
+          .gender(request.gender())
           .status(EmployeeStatus.INVITED)
           .password("") // set later via invite link
           .build();
@@ -201,7 +202,8 @@ public class AuthServiceImpl implements AuthService {
           safe(employee.getLastName()),
           employee.getEmail(),
           employee.getPhoneNumber(),
-          employee.getRole()
+          employee.getRole(),
+          employee.getGender()
     );
   }
 
@@ -233,8 +235,8 @@ public class AuthServiceImpl implements AuthService {
                 safe(employee.getLastName()),
                 employee.getEmail(),
                 employee.getPhoneNumber(),
-                employee.getRole()
-          ))
+                employee.getRole(),
+                employee.getGender()))
           .collect(Collectors.toList());
   }
 
@@ -254,6 +256,12 @@ public class AuthServiceImpl implements AuthService {
       employee.setEmail(updateEmployee.email());
     }
     if (updateEmployee.phoneNumber() != null && !updateEmployee.phoneNumber().isBlank()) {
+      employee.setPhoneNumber(updateEmployee.phoneNumber());
+    }
+    if (updateEmployee.role() != null) {
+      employee.setPhoneNumber(updateEmployee.phoneNumber());
+    }
+    if (updateEmployee.gender() != null) {
       employee.setPhoneNumber(updateEmployee.phoneNumber());
     }
     return employeeRepository.save(employee);
