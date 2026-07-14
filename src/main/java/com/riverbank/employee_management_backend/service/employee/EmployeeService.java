@@ -35,4 +35,5 @@ public interface EmployeeService {
 
   LeaveResponse withdrawLeave(UUID leaveId, String username);
 
+  LeaveResponse getLeaveById(UUID leaveId);
 }

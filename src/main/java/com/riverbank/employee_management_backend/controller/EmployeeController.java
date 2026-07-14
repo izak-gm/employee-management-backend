@@ -51,6 +51,15 @@ public class EmployeeController {
     return ResponseEntity.ok(employeeService.getPendingLeaves());
   }
 
+  @GetMapping("/leaves/{leaveId}")
+  public ResponseEntity<LeaveResponse> getLeaveById(
+        @PathVariable UUID leaveId) {
+
+    return ResponseEntity.ok(
+          employeeService.getLeaveById(leaveId)
+    );
+  }
+
   @GetMapping("/leaves/notifications")
   public ResponseEntity<List<LeaveResponse>> myNotifications(@AuthenticationPrincipal UserDetails user) {
     return ResponseEntity.ok(employeeService.getPendingCoverActionsForMe(user.getUsername()));
@@ -61,6 +70,7 @@ public class EmployeeController {
   public ResponseEntity<List<EmployeeResponse>> getActiveEmployees() {
     return ResponseEntity.ok(employeeService.getActiveEmployees());
   }
+
 
   @GetMapping("/leaves/balance")
   public ResponseEntity<List<LeaveBalanceResponse>> myBalance(@AuthenticationPrincipal UserDetails user) {

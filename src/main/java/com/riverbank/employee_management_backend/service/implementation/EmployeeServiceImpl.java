@@ -47,6 +47,19 @@ public class EmployeeServiceImpl implements EmployeeService {
     Employee employee = employeeRepository.findByEmail(employeeEmail)
           .orElseThrow(() -> new UsernameNotFoundException("Employee not found"));
 
+    if (request.leaveType() != LeaveType.COMPASSIONATE
+          && request.coverEmployeeId() == null) {
+      throw new LeaveActionNotAllowedException(
+            "Please select a cover employee before submitting your leave request.");
+    }
+    LocalDate today = LocalDate.now();
+
+    if (!request.startDate().isAfter(today)) {
+      throw new LeaveActionNotAllowedException(
+            "Leave must start from tomorrow onwards."
+      );
+    }
+    
     validateNoOverlappingLeave(employee.getId(), request.startDate(), request.endDate());
     validateLeaveBalance(employee, request);
 
@@ -149,6 +162,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     leave.setStatus(LeaveStatus.WITHDRAWN);
     return toLeaveResponse(leaveRepository.save(leave));
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public LeaveResponse getLeaveById(UUID leaveId) {
+
+    Leave leave = leaveRepository.findById(leaveId)
+          .orElseThrow(() ->
+                new LeaveActionNotAllowedException("Leave not found."));
+
+    return toLeaveResponse(leave);
   }
 
   // Validations
