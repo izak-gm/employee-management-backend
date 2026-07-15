@@ -31,11 +31,11 @@ public interface AuthService {
 
   EmployeeResponse getEmployeeById(UUID id);
 
-  Employee updateProfile(UUID id, UpdateEmployee updateEmployee);
+  EmployeeResponse updateProfile(UUID id, UpdateEmployee updateEmployee);
 
   void deleteEmployee(UUID id);
 
-  Employee updateOwnProfile(String username, UpdateEmployee updateEmployee);
+  EmployeeResponse updateOwnProfile(String username, UpdateEmployee updateEmployee);
 
   EmployeeResponse getEmployeeByEmail(String username);
 }

@@ -127,11 +127,15 @@ Tokens are valid for **7 days** from issuance.
 
 ### Roles
 
-| Role         | Permissions                                                                             |
-|--------------|-----------------------------------------------------------------------------------------|
-| `EMPLOYEE`   | View/edit own profile only                                                              |
-| `ADMIN`      | Manage (view/edit/delete) Employee accounts; cannot manage other Admins or Super Admins |
-| `SUPERADMIN` | Full access — manage all accounts including Admins and other Super Admins               |
+| Role                                                  | Responsibilities                                                                                                                                           |
+|-------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Super Admin**                                       | Full system access. Manages system configuration, creates admins, manages users, payroll settings, departments, roles, reports, and has all permissions.   |
+| **Admin (HR Officer)**                                | Manages employees, approves leave, processes payroll, generates reports, updates employee records, but cannot manage Super Admins or system-wide settings. |
+| **Manager / Supervisor** *(optional but recommended)* | Oversees a department or team. Approves leave for direct reports, views team information, but cannot manage payroll or system settings.                    |
+| **Software_Engineer**                                 | Views profile, applies for leave, views leave balance, downloads payslips, updates limited personal information (if allowed).                              |
+| **Senior_Engineer**                                   | Views profile, applies for leave, views leave balance, downloads payslips, updates limited personal information (if allowed).                              |
+| **Payroll Officer** *(optional)*                      | Configures salaries, processes payroll, generates payslips, statutory reports, and bank transfer reports, but cannot manage employees or system settings.  |
+| **Finance Officer** *(optional)*                      | Views payroll, approves payments, downloads payroll reports, but cannot edit employee information.                                                         |
 
 ## API Endpoints
 
