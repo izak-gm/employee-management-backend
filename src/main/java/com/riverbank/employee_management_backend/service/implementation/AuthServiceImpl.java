@@ -47,8 +47,8 @@ import static com.riverbank.employee_management_backend.util.StringUtils.safe;
 public class AuthServiceImpl implements AuthService {
 
   private static final Map<Role, Set<Role>> Auth_HIERARCHY = Map.of(
-        Role.SUPERADMIN, Set.of(Role.ADMIN, Role.SUPERADMIN, Role.EMPLOYEE),
-        Role.ADMIN, Set.of(Role.EMPLOYEE)
+        Role.SUPERADMIN, Set.of(Role.HR_ADMIN, Role.SUPERADMIN, Role.SOFTWARE_ENGINEER),
+        Role.HR_ADMIN, Set.of(Role.SOFTWARE_ENGINEER)
   );
 
   private final EmployeeRepository employeeRepository;
@@ -242,7 +242,7 @@ public class AuthServiceImpl implements AuthService {
 
 
   @Override
-  public Employee updateProfile(UUID id, UpdateEmployee updateEmployee) {
+  public EmployeeResponse updateProfile(UUID id, UpdateEmployee updateEmployee) {
     Employee employee = employeeRepository.findById(id)
           .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));
 
@@ -259,12 +259,14 @@ public class AuthServiceImpl implements AuthService {
       employee.setPhoneNumber(updateEmployee.phoneNumber());
     }
     if (updateEmployee.role() != null) {
-      employee.setPhoneNumber(updateEmployee.phoneNumber());
+      employee.setRole(updateEmployee.role());
     }
     if (updateEmployee.gender() != null) {
-      employee.setPhoneNumber(updateEmployee.phoneNumber());
+      employee.setGender(updateEmployee.gender());
     }
-    return employeeRepository.save(employee);
+    Employee savedEmployee = employeeRepository.save(employee);
+
+    return employeeUtils.toEmployeeResponse(savedEmployee);
   }
 
   @Override
@@ -276,7 +278,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public Employee updateOwnProfile(String email, UpdateEmployee updateEmployee) {
+  public EmployeeResponse updateOwnProfile(String email, UpdateEmployee updateEmployee) {
     Employee employee = employeeRepository.findByEmail(email)
           .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     return updateProfile(employee.getId(), updateEmployee);

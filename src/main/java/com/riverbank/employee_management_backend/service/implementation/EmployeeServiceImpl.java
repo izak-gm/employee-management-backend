@@ -335,7 +335,7 @@ public class EmployeeServiceImpl implements EmployeeService {
           employeeRepository.countByStatus(EmployeeStatus.ACTIVE),
           employeeRepository.countByStatus(EmployeeStatus.INVITED),
           employeeRepository.countByStatus(EmployeeStatus.INACTIVE),
-          employeeRepository.countByRole(Role.ADMIN),
+          employeeRepository.countByRole(Role.HR_ADMIN),
           employeeRepository.countByRole(Role.SUPERADMIN),
           leaveRepository.countByStatus(LeaveStatus.PENDING_COVER),
           leaveRepository.countByStatus(LeaveStatus.APPROVED),

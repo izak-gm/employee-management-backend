@@ -31,7 +31,7 @@ public class AuthController {
   private final EmployeeService employeeService;
 
   @PostMapping("/employees/create")
-  @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
+  @PreAuthorize("hasAnyRole('SUPERADMIN','HR_ADMIN')")
   public ResponseEntity<EmployeeResponse> createEmployee(
         @Valid @RequestBody CreateEmployeeRequest request) {
     return ResponseEntity.ok(authService.createEmployee(request));
@@ -49,7 +49,7 @@ public class AuthController {
   }
 
   @PutMapping("/employees/update-profile/me")
-  public ResponseEntity<Employee> updateMyProfile(
+  public ResponseEntity<EmployeeResponse> updateMyProfile(
         @RequestBody UpdateEmployee updateEmployee,
         @AuthenticationPrincipal UserDetails currentUser) {
     return ResponseEntity.ok(authService.updateOwnProfile(currentUser.getUsername(), updateEmployee));
@@ -57,7 +57,7 @@ public class AuthController {
 
   // CHANGED: only Admin/SuperAdmin can look up another employee by ID
   @GetMapping("/employees/{employeeId}")
-  @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
+  @PreAuthorize("hasAnyRole('SUPERADMIN','HR_ADMIN')")
   public EmployeeResponse getEmployeeById(@PathVariable("employeeId") UUID id,
                                           HttpServletRequest request) {
     return authService.getEmployeeById(id);
@@ -65,7 +65,7 @@ public class AuthController {
 
   // CHANGED: only Admin/SuperAdmin can list/search employees
   @GetMapping("/employees")
-  @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
+  @PreAuthorize("hasAnyRole('SUPERADMIN','HR_ADMIN')")
   public List<EmployeeResponse> getEmployeesByIds(
         @RequestParam(required = false) List<UUID> ids,
         @ModelAttribute EmployeeRequest employeeRequest
@@ -75,8 +75,8 @@ public class AuthController {
 
   // CHANGED: only Admin/SuperAdmin can edit another employee's profile by ID
   @PutMapping("/employees/update-profile/{employeeId}")
-  @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
-  public ResponseEntity<Employee> updateEmployee(
+  @PreAuthorize("hasAnyRole('SUPERADMIN','HR_ADMIN')")
+  public ResponseEntity<EmployeeResponse> updateEmployee(
         @RequestBody UpdateEmployee updateEmployee,
         @PathVariable("employeeId") UUID id
   ) {
@@ -84,7 +84,7 @@ public class AuthController {
   }
 
   @DeleteMapping("/employees/{employeeId}")
-  @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
+  @PreAuthorize("hasAnyRole('SUPERADMIN','HR_ADMIN')")
   public ResponseEntity<MessageResponse> deleteEmployee(@PathVariable("employeeId") UUID id) {
     authService.deleteEmployee(id);
     return ResponseEntity.ok(new MessageResponse("Employee deleted successfully"));
