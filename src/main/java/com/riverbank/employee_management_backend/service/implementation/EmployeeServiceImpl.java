@@ -59,7 +59,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             "Leave must start from tomorrow onwards."
       );
     }
-    
+
     validateNoOverlappingLeave(employee.getId(), request.startDate(), request.endDate());
     validateLeaveBalance(employee, request);
 
@@ -110,7 +110,9 @@ public class EmployeeServiceImpl implements EmployeeService {
             .orElseThrow(() -> new EmployeeNotFoundException("Cover employee not found"));
       validateCoverEmployeeAvailable(cover.getId(), request.startDate(), request.endDate());
       leave.setCoverEmployee(cover);
-      leave.setStatus(LeaveStatus.PENDING_COVER);
+      if (leave.getStatus() == LeaveStatus.COVER_DECLINED) {
+        leave.setStatus(LeaveStatus.PENDING_COVER);
+      }
     }
     return toLeaveResponse(leaveRepository.save(leave));
   }
