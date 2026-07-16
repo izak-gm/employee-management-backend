@@ -27,6 +27,7 @@ public class PayrollEarning {
   @JoinColumn(name = "earning_type_id")
   private EarningType earningType;
 
+
   @Column(nullable = false, precision = 19, scale = 2)
   private BigDecimal amount;
 
