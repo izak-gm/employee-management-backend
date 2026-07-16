@@ -8,6 +8,7 @@ import com.riverbank.employee_management_backend.dto.employee.*;
 import com.riverbank.employee_management_backend.entity.Employee;
 import com.riverbank.employee_management_backend.entity.Leave;
 import com.riverbank.employee_management_backend.enums.*;
+import com.riverbank.employee_management_backend.enus.Gender;
 import com.riverbank.employee_management_backend.exception.EmployeeNotFoundException;
 import com.riverbank.employee_management_backend.exception.LeaveActionNotAllowedException;
 import com.riverbank.employee_management_backend.repository.EmployeeRepository;
@@ -302,12 +303,29 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   public List<LeaveBalanceResponse> getMyLeaveBalances(String email) {
     Employee employee = employeeRepository.findByEmail(email).orElseThrow();
+
     int year = LocalDate.now().getYear();
-    return Arrays.stream(LeaveType.values()).map(type -> {
-      if (type.isUnlimited()) return new LeaveBalanceResponse(type, -1, 0, -1, true);
-      int used = getUsedDays(employee.getId(), type, year);
-      return new LeaveBalanceResponse(type, type.getMaxDays(), used, type.getMaxDays() - used, false);
-    }).toList();
+
+    return Arrays.stream(LeaveType.values())
+          .filter(type -> {
+            // Male employees cannot have maternity leave
+            if (employee.getGender() == Gender.MALE && type == LeaveType.MATERNITY) {
+              return false;
+            }
+            // Female employees cannot have paternity leave
+            return employee.getGender() != Gender.FEMALE || type != LeaveType.PATERNITY;
+          })
+          .map(type -> {
+            if (type.isUnlimited()) {
+              return new LeaveBalanceResponse(type, -1, 0, -1, true);
+            }
+
+            int maxDays = type.getMaxDays();
+            int used = getUsedDays(employee.getId(), type, year);
+
+            return new LeaveBalanceResponse(type, maxDays, used, Math.max(0, maxDays - used), false);
+          })
+          .toList();
   }
 
   private LeaveResponse toLeaveResponse(Leave l) {
