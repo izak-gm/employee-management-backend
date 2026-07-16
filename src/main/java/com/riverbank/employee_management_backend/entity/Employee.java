@@ -39,7 +39,7 @@ public class Employee implements UserDetails {
   @Column(nullable = false)
   private String lastName;
 
-  private String otherNames;
+  private String middleName;
 
   @Column(nullable = false, unique = true)
   private String email;
@@ -56,7 +56,7 @@ public class Employee implements UserDetails {
   @Column(unique = true)
   private String nationalId;
 
-  private String profilePhoto;
+//  private String profilePhoto;
 
   @Column(nullable = false)
   private String password;
@@ -75,13 +75,13 @@ public class Employee implements UserDetails {
 
   private LocalDate exitDate;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "department_id")
-  private Department department;
+//  @ManyToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = "department_id")
+//  private Department department;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "position_id")
-  private Position position;
+//  @ManyToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = "position_id")
+//  private Position position;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "supervisor_id")
@@ -90,8 +90,8 @@ public class Employee implements UserDetails {
   @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private InviteToken inviteToken;
 
-  @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  private EmployeeSalary employeeSalary;
+//  @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//  private EmployeeSalary employeeSalary;
 
   @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
   private List<Leave> leaves;
