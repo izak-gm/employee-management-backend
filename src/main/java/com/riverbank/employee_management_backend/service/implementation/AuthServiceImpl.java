@@ -11,8 +11,7 @@ import com.riverbank.employee_management_backend.enums.Role;
 import com.riverbank.employee_management_backend.exception.EmployeeNotFoundException;
 import com.riverbank.employee_management_backend.exception.UserAlreadyExistsException;
 import com.riverbank.employee_management_backend.mapper.AuthMapper;
-import com.riverbank.employee_management_backend.repository.EmployeeRepository;
-import com.riverbank.employee_management_backend.repository.InviteTokenRepository;
+import com.riverbank.employee_management_backend.repository.*;
 import com.riverbank.employee_management_backend.service.auth.AuthService;
 import com.riverbank.employee_management_backend.service.email.EmailService;
 import com.riverbank.employee_management_backend.service.jwt.JwtService;
@@ -59,6 +58,9 @@ public class AuthServiceImpl implements AuthService {
   private final InviteTokenRepository inviteTokenRepository;
   private final EmailService emailService;
   private final EmployeeUtils employeeUtils;
+  private final DepartmentRepository departmentRepository;
+  private final PositionRepository positionRepository;
+  private final EmployeePayrollProfileRepository payrollProfileRepository;
 
   @Value("${app.invite-token-expiry-hours:48}")
   private int inviteTokenExpiryHours;

@@ -1,6 +1,7 @@
-package com.riverbank.employee_management_backend.entity;
+package com.riverbank.employee_management_backend.entity.payrolls;
 
-import com.riverbank.employee_management_backend.enums.PayrollStatus;
+import com.riverbank.employee_management_backend.entity.Employee;
+import com.riverbank.employee_management_backend.enums.payrolls.PayrollStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

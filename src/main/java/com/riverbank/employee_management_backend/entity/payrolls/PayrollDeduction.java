@@ -1,5 +1,6 @@
-package com.riverbank.employee_management_backend.entity;
+package com.riverbank.employee_management_backend.entity.payrolls;
 
+import com.riverbank.employee_management_backend.entity.payrolls.*;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,8 +13,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "payroll_earning")
-public class PayrollEarning {
+@Table(name = "payroll_deduction")
+public class PayrollDeduction {
 
   @Id
   @GeneratedValue
@@ -24,9 +25,8 @@ public class PayrollEarning {
   private Payroll payroll;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "earning_type_id")
-  private EarningType earningType;
-
+  @JoinColumn(name = "deduction_type_id")
+  private DeductionType deductionType;
 
   @Column(nullable = false, precision = 19, scale = 2)
   private BigDecimal amount;

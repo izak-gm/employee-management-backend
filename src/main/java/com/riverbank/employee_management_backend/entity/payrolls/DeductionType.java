@@ -1,6 +1,6 @@
-package com.riverbank.employee_management_backend.entity;
+package com.riverbank.employee_management_backend.entity.payrolls;
 
-import com.riverbank.employee_management_backend.enums.DeductionCalculationType;
+import com.riverbank.employee_management_backend.enums.payrolls.DeductionCalculationType;
 import jakarta.persistence.*;
 import lombok.*;
 

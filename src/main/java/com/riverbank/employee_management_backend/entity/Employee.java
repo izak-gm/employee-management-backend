@@ -1,7 +1,12 @@
 package com.riverbank.employee_management_backend.entity;
 
+import com.riverbank.employee_management_backend.entity.payrolls.Department;
+import com.riverbank.employee_management_backend.entity.payrolls.EmployeePayrollProfile;
+import com.riverbank.employee_management_backend.entity.payrolls.Payroll;
+import com.riverbank.employee_management_backend.entity.payrolls.Position;
 import com.riverbank.employee_management_backend.enums.EmployeeStatus;
 import com.riverbank.employee_management_backend.enums.Role;
+import com.riverbank.employee_management_backend.enums.payrolls.EmploymentType;
 import com.riverbank.employee_management_backend.enus.Gender;
 import jakarta.persistence.*;
 import lombok.*;
@@ -39,7 +44,7 @@ public class Employee implements UserDetails {
   @Column(nullable = false)
   private String lastName;
 
-  private String otherNames;
+  private String middleName;
 
   @Column(nullable = false, unique = true)
   private String email;
@@ -75,6 +80,10 @@ public class Employee implements UserDetails {
 
   private LocalDate exitDate;
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private EmploymentType employmentType;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "department_id")
   private Department department;
@@ -87,17 +96,20 @@ public class Employee implements UserDetails {
   @JoinColumn(name = "supervisor_id")
   private Employee supervisor;
 
+  @OneToMany(mappedBy = "supervisor")
+  private List<Employee> subordinates;
+  
   @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private InviteToken inviteToken;
-
-  @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  private EmployeeSalary employeeSalary;
 
   @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
   private List<Leave> leaves;
 
   @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
   private List<Payroll> payrolls;
+
+  @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private EmployeePayrollProfile payrollProfile;
 
   @CreationTimestamp
   private LocalDateTime createdAt;

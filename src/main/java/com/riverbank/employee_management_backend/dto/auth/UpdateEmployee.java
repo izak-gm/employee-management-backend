@@ -1,17 +1,30 @@
 package com.riverbank.employee_management_backend.dto.auth;
 
+import com.riverbank.employee_management_backend.enums.EmployeeStatus;
 import com.riverbank.employee_management_backend.enums.Role;
 import com.riverbank.employee_management_backend.enus.Gender;
 import jakarta.validation.constraints.Email;
 
+import java.time.LocalDate;
+import java.util.UUID;
+
 public record UpdateEmployee(
       String firstName,
+      String middleName,
       String lastName,
-//      TODO: standardize the phone number
-      String phoneNumber,
-      @Email(message = "Email must be valid")
+      @Email
       String email,
+      String phoneNumber,
+      Gender gender,
+      LocalDate dateOfBirth,
+      String nationalId,
       Role role,
-      Gender gender
+      EmployeeStatus status,
+      LocalDate hireDate,
+      LocalDate confirmationDate,
+      LocalDate exitDate,
+      UUID departmentId,
+      UUID positionId,
+      UUID supervisorId
 ) {
 }
