@@ -1,4 +1,11 @@
 package com.riverbank.employee_management_backend.repository;
 
-public interface DepartmentRepository {
+import com.riverbank.employee_management_backend.entity.Department;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.UUID;
+
+@Repository
+public interface DepartmentRepository extends JpaRepository<Department, UUID> {
 }

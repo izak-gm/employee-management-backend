@@ -1,6 +1,5 @@
-package com.riverbank.employee_management_backend.entity.payrolls;
+package com.riverbank.employee_management_backend.entity;
 
-import com.riverbank.employee_management_backend.entity.Employee;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,8 +12,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "department")
-public class Department {
+@Table(name = "position")
+public class Position {
 
   @Id
   @GeneratedValue
@@ -27,6 +26,6 @@ public class Department {
 
   private boolean active = true;
 
-  @OneToMany(mappedBy = "department")
+  @OneToMany(mappedBy = "position")
   private List<Employee> employees;
 }

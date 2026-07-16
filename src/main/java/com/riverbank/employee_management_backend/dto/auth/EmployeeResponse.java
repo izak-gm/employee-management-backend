@@ -1,8 +1,8 @@
 package com.riverbank.employee_management_backend.dto.auth;
 
 import com.riverbank.employee_management_backend.enums.EmployeeStatus;
+import com.riverbank.employee_management_backend.enums.Gender;
 import com.riverbank.employee_management_backend.enums.Role;
-import com.riverbank.employee_management_backend.enus.Gender;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

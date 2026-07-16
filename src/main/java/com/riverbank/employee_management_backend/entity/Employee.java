@@ -1,13 +1,11 @@
 package com.riverbank.employee_management_backend.entity;
 
-import com.riverbank.employee_management_backend.entity.payrolls.Department;
 import com.riverbank.employee_management_backend.entity.payrolls.EmployeePayrollProfile;
 import com.riverbank.employee_management_backend.entity.payrolls.Payroll;
-import com.riverbank.employee_management_backend.entity.payrolls.Position;
 import com.riverbank.employee_management_backend.enums.EmployeeStatus;
+import com.riverbank.employee_management_backend.enums.Gender;
 import com.riverbank.employee_management_backend.enums.Role;
 import com.riverbank.employee_management_backend.enums.payrolls.EmploymentType;
-import com.riverbank.employee_management_backend.enus.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -98,7 +96,7 @@ public class Employee implements UserDetails {
 
   @OneToMany(mappedBy = "supervisor")
   private List<Employee> subordinates;
-  
+
   @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private InviteToken inviteToken;
 

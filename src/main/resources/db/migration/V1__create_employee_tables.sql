@@ -1,15 +1,95 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-CREATE TABLE IF NOT EXISTS employee (
+-- DEPARTMENT
+CREATE TABLE IF NOT EXISTS  department (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    first_name VARCHAR(255),
-    last_name VARCHAR(255),
-    email VARCHAR(255) NOT NULL UNIQUE,
-    phone_number VARCHAR(255),
-    password VARCHAR(255) NOT NULL,
-    role VARCHAR(50) NOT NULL,
-    status VARCHAR(50) NOT NULL
+    name VARCHAR(100) NOT NULL UNIQUE,
+    code VARCHAR(20) UNIQUE,
+    description TEXT,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- POSITION
+CREATE TABLE  IF NOT EXISTS position (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(100) NOT NULL,
+    code VARCHAR(20),
+    description TEXT,
+    department_id UUID,
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_position_department
+        FOREIGN KEY(department_id)
+        REFERENCES department(id)
+
+);
+
+-- EMPLOYEE
+CREATE TABLE IF NOT EXISTS  employee (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    employee_number VARCHAR(30) NOT NULL UNIQUE,
+    first_name VARCHAR(100) NOT NULL,
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    phone_number VARCHAR(30) NOT NULL UNIQUE,
+    gender VARCHAR(20) NOT NULL,
+    date_of_birth DATE,
+    national_id VARCHAR(30) UNIQUE,
+    profile_photo VARCHAR(255),
+    password TEXT NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    hire_date DATE NOT NULL,
+    confirmation_date DATE,
+    exit_date DATE,
+    employment_type VARCHAR(50) NOT NULL,
+    department_id UUID,
+    position_id UUID,
+    supervisor_id UUID,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_employee_department
+
+        FOREIGN KEY(department_id)
+
+        REFERENCES department(id),
+
+    CONSTRAINT fk_employee_position
+
+        FOREIGN KEY(position_id)
+
+        REFERENCES position(id),
+
+    CONSTRAINT fk_employee_supervisor
+
+        FOREIGN KEY(supervisor_id)
+
+        REFERENCES employee(id)
+
+);
+CREATE INDEX  IF NOT EXISTS  idx_employee_email
+ON employee(email);
+
+CREATE INDEX IF NOT EXISTS  idx_employee_number
+ON employee(employee_number);
+
+CREATE INDEX IF NOT EXISTS  idx_employee_department
+ON employee(department_id);
+
+CREATE INDEX IF NOT EXISTS  idx_employee_position
+ON employee(position_id);
+
+CREATE INDEX  IF NOT EXISTS idx_employee_status
+ON employee(status);
+
+CREATE INDEX  IF NOT EXISTS idx_employee_role
+ON employee(role);
 
 CREATE TABLE IF NOT EXISTS invite_token (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -23,49 +103,6 @@ CREATE TABLE IF NOT EXISTS invite_token (
         ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS employee_leave (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    employee_id UUID NOT NULL,
-    cover_employee_id UUID,
-    approved_by UUID,
-    leave_type VARCHAR(50) NOT NULL,
-    status VARCHAR(50) NOT NULL,
-    start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
-    reason TEXT,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP,
-    CONSTRAINT fk_leave_employee
-        FOREIGN KEY (employee_id)
-        REFERENCES employee(id)
-        ON DELETE CASCADE,
-    CONSTRAINT fk_leave_cover_employee
-        FOREIGN KEY (cover_employee_id)
-        REFERENCES employee(id)
-        ON DELETE SET NULL,
-    CONSTRAINT fk_leave_approved_by
-        FOREIGN KEY (approved_by)
-        REFERENCES employee(id)
-        ON DELETE SET NULL
-);
-
-CREATE INDEX IF NOT EXISTS idx_employee_email
-    ON employee(email);
-
-CREATE INDEX IF NOT EXISTS idx_leave_employee
-    ON employee_leave(employee_id);
-
-CREATE INDEX IF NOT EXISTS idx_leave_cover_employee
-    ON employee_leave(cover_employee_id);
-
-CREATE INDEX IF NOT EXISTS idx_leave_approved_by
-    ON employee_leave(approved_by);
-
-CREATE INDEX IF NOT EXISTS idx_leave_status
-    ON employee_leave(status);
-
-CREATE INDEX IF NOT EXISTS idx_leave_type
-    ON employee_leave(leave_type);
 
 CREATE INDEX IF NOT EXISTS idx_invite_token
     ON invite_token(token);
