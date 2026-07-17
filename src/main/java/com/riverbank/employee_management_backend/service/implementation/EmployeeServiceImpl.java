@@ -2,15 +2,13 @@ package com.riverbank.employee_management_backend.service.implementation;
 
 import com.riverbank.employee_management_backend.dto.auth.EmployeeResponse;
 import com.riverbank.employee_management_backend.dto.dashboard.DashboardStatsResponse;
-import com.riverbank.employee_management_backend.dto.employee.LeaveActionRequest;
-import com.riverbank.employee_management_backend.dto.employee.LeaveRequest;
 import com.riverbank.employee_management_backend.dto.employee.*;
 import com.riverbank.employee_management_backend.entity.Employee;
 import com.riverbank.employee_management_backend.entity.Leave;
 import com.riverbank.employee_management_backend.enums.*;
-import com.riverbank.employee_management_backend.enus.Gender;
 import com.riverbank.employee_management_backend.exception.EmployeeNotFoundException;
 import com.riverbank.employee_management_backend.exception.LeaveActionNotAllowedException;
+import com.riverbank.employee_management_backend.mapper.AuthMapper;
 import com.riverbank.employee_management_backend.repository.EmployeeRepository;
 import com.riverbank.employee_management_backend.repository.LeaveRepository;
 import com.riverbank.employee_management_backend.service.employee.EmployeeService;
@@ -40,7 +38,7 @@ public class EmployeeServiceImpl implements EmployeeService {
   );
   private final EmployeeRepository employeeRepository;
   private final LeaveRepository leaveRepository;
-  private final EmployeeUtils employeeUtils;
+  private final AuthMapper authMapper;
 
   // --- Leave management ---
   @Transactional
@@ -286,7 +284,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   public List<EmployeeResponse> getActiveEmployees() {
     return employeeRepository.findByStatus(EmployeeStatus.ACTIVE)
-          .stream().map(employeeUtils::toEmployeeResponse).toList();
+          .stream().map(authMapper::toEmployeeResponse).toList();
   }
 
   public List<LeaveResponse> getPendingCoverActionsForMe(String email) {
@@ -303,7 +301,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   public List<LeaveBalanceResponse> getMyLeaveBalances(String email) {
     Employee employee = employeeRepository.findByEmail(email).orElseThrow();
-
     int year = LocalDate.now().getYear();
 
     return Arrays.stream(LeaveType.values())

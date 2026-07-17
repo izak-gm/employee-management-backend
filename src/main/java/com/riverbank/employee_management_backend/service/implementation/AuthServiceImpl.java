@@ -4,18 +4,22 @@ import com.riverbank.employee_management_backend.dto.auth.*;
 import com.riverbank.employee_management_backend.dto.password.ForgotPasswordRequest;
 import com.riverbank.employee_management_backend.dto.password.ResetPasswordRequest;
 import com.riverbank.employee_management_backend.dto.password.SetPasswordRequest;
+import com.riverbank.employee_management_backend.entity.Department;
 import com.riverbank.employee_management_backend.entity.Employee;
 import com.riverbank.employee_management_backend.entity.InviteToken;
+import com.riverbank.employee_management_backend.entity.Position;
 import com.riverbank.employee_management_backend.enums.EmployeeStatus;
 import com.riverbank.employee_management_backend.enums.Role;
 import com.riverbank.employee_management_backend.exception.EmployeeNotFoundException;
+import com.riverbank.employee_management_backend.exception.ResourceAlreadyExistsException;
+import com.riverbank.employee_management_backend.exception.ResourceNotFoundException;
 import com.riverbank.employee_management_backend.exception.UserAlreadyExistsException;
 import com.riverbank.employee_management_backend.mapper.AuthMapper;
-import com.riverbank.employee_management_backend.repository.EmployeeRepository;
-import com.riverbank.employee_management_backend.repository.InviteTokenRepository;
+import com.riverbank.employee_management_backend.repository.*;
 import com.riverbank.employee_management_backend.service.auth.AuthService;
 import com.riverbank.employee_management_backend.service.email.EmailService;
 import com.riverbank.employee_management_backend.service.jwt.JwtService;
+import com.riverbank.employee_management_backend.util.EmployeeNumberGenerator;
 import com.riverbank.employee_management_backend.util.EmployeeUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +63,10 @@ public class AuthServiceImpl implements AuthService {
   private final InviteTokenRepository inviteTokenRepository;
   private final EmailService emailService;
   private final EmployeeUtils employeeUtils;
+  private final DepartmentRepository departmentRepository;
+  private final PositionRepository positionRepository;
+  private final EmployeePayrollProfileRepository payrollProfileRepository;
+  private final EmployeeNumberGenerator employeeNumberGenerator;
 
   @Value("${app.invite-token-expiry-hours:48}")
   private int inviteTokenExpiryHours;
@@ -106,17 +114,41 @@ public class AuthServiceImpl implements AuthService {
       throw new UserAlreadyExistsException("An employee with this email already exists");
     }
 
-    Employee employee = Employee.builder()
-          .firstName(request.firstName())
-          .lastName(request.lastName())
-          .email(request.email())
-          .phoneNumber(request.phoneNumber())
-          .role(request.role())
-          .gender(request.gender())
-          .status(EmployeeStatus.INVITED)
-          .password("") // set later via invite link
-          .build();
 
+    if (employeeRepository.existsByPhoneNumber(request.phoneNumber())) {
+      throw new ResourceAlreadyExistsException("Phone number already exists.");
+    }
+
+    if (request.nationalId() != null &&
+          employeeRepository.existsByNationalId(request.nationalId())) {
+      throw new ResourceAlreadyExistsException("National ID already exists.");
+    }
+    Employee employee = authMapper.toEmployee(request);
+    Department department = null;
+    if (request.departmentId() != null) {
+      department = departmentRepository.findById(request.departmentId())
+            .orElseThrow(() -> new ResourceNotFoundException("Department not found"));
+    }
+
+    Position position = null;
+    if (request.positionId() != null) {
+      position = positionRepository.findById(request.positionId())
+            .orElseThrow(() -> new ResourceNotFoundException("Position not found"));
+    }
+
+    Employee supervisor = null;
+    if (request.supervisorId() != null) {
+      supervisor = employeeRepository.findById(request.supervisorId())
+            .orElseThrow(() -> new ResourceNotFoundException("Supervisor not found"));
+    }
+    employee.setDepartment(department);
+    employee.setPosition(position);
+    employee.setSupervisor(supervisor);
+
+
+    employee.setEmployeeNumber(employeeNumberGenerator.generate());
+
+    employee.setStatus(EmployeeStatus.INVITED);
     employee = employeeRepository.save(employee);
 
     String token = UUID.randomUUID().toString();
@@ -130,7 +162,7 @@ public class AuthServiceImpl implements AuthService {
 
     emailService.sendInviteEmail(employee.getEmail(), employee.getFirstName(), token);
 
-    return employeeUtils.toEmployeeResponse(employee);
+    return authMapper.toEmployeeResponse(employee);
   }
 
   // --- Set password via invite link ---
@@ -196,15 +228,7 @@ public class AuthServiceImpl implements AuthService {
     Employee employee = employeeRepository.findById(id)
           .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
 
-    return new EmployeeResponse(
-          employee.getId(),
-          safe(employee.getFirstName()),
-          safe(employee.getLastName()),
-          employee.getEmail(),
-          employee.getPhoneNumber(),
-          employee.getRole(),
-          employee.getGender()
-    );
+    return authMapper.toEmployeeResponse(employee);
   }
 
   @Override
@@ -229,15 +253,8 @@ public class AuthServiceImpl implements AuthService {
           .collect(Collectors.toList());
 
     return filterEmployee.stream()
-          .map(employee -> new EmployeeResponse(
-                employee.getId(),
-                safe(employee.getFirstName()),
-                safe(employee.getLastName()),
-                employee.getEmail(),
-                employee.getPhoneNumber(),
-                employee.getRole(),
-                employee.getGender()))
-          .collect(Collectors.toList());
+          .map(authMapper::toEmployeeResponse)
+          .toList();
   }
 
 
@@ -266,7 +283,7 @@ public class AuthServiceImpl implements AuthService {
     }
     Employee savedEmployee = employeeRepository.save(employee);
 
-    return employeeUtils.toEmployeeResponse(savedEmployee);
+    return authMapper.toEmployeeResponse(savedEmployee);
   }
 
   @Override

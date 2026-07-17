@@ -21,19 +21,39 @@ import java.util.Map;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+  @ExceptionHandler({
+        EmployeeNotFoundException.class,
+        DepartmentNotFoundException.class,
+        ResourceNotFoundException.class
+  })
+  public ResponseEntity<ErrorResponse> handleNotFound(
+        RuntimeException ex,
+        HttpServletRequest request) {
 
-  @ExceptionHandler(EmployeeNotFoundException.class)
-  public ResponseEntity<ErrorResponse> handleEmployeeNotFound(
-        EmployeeNotFoundException ex, HttpServletRequest request) {
-    log.warn("Employee not found: {}", ex.getMessage());
-    return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    log.warn("Resource not found: {}", ex.getMessage());
+
+    return buildResponse(
+          HttpStatus.NOT_FOUND,
+          ex.getMessage(),
+          request
+    );
   }
 
-  @ExceptionHandler(UserAlreadyExistsException.class)
-  public ResponseEntity<ErrorResponse> handleUserExists(
-        UserAlreadyExistsException ex, HttpServletRequest request) {
-    log.warn("Registration attempt with existing email on {}: {}", request.getRequestURI(), ex.getMessage());
-    return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
+  @ExceptionHandler({
+        UserAlreadyExistsException.class,
+        ResourceAlreadyExistsException.class
+  })
+  public ResponseEntity<ErrorResponse> handleResourceAlreadyExists(
+        RuntimeException ex,
+        HttpServletRequest request) {
+
+    log.warn("Resource already exists: {}", ex.getMessage());
+
+    return buildResponse(
+          HttpStatus.CONFLICT,
+          ex.getMessage(),
+          request
+    );
   }
 
   @ExceptionHandler(BadCredentialsException.class)

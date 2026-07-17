@@ -30,10 +30,14 @@ public class SecurityConfig {
         "/api/v1/auth/setup-password"
   };
   private static final String[] ADMIN_URL = {
-        "/api/v1/auth/admin/**"
+        "/api/v1/auth/admin/**",
+        "/api/v1/departments/**",
+        "/api/v1/positions/**",
   };
   private static final String[] EMPLOYEES_URL = {
-        "/api/v1/employees/**"
+        "/api/v1/employees/**",
+        "/api/v1/departments/**",
+        "/api/v1/positions/**",
   };
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
   private final CorsConfigurationSource corsConfigurationSource;

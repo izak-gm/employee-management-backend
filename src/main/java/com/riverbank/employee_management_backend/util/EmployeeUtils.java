@@ -1,14 +1,11 @@
 package com.riverbank.employee_management_backend.util;
 
-import com.riverbank.employee_management_backend.dto.auth.EmployeeResponse;
-import com.riverbank.employee_management_backend.entity.Employee;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.springframework.stereotype.Component;
 
 @Component
 public class EmployeeUtils {
@@ -29,10 +26,5 @@ public class EmployeeUtils {
     }
 
     return daysPerYear;
-  }
-
-  public EmployeeResponse toEmployeeResponse(Employee e) {
-    return new EmployeeResponse(e.getId(), e.getFirstName(), e.getLastName(),
-          e.getEmail(), e.getPhoneNumber(), e.getRole(), e.getGender());
   }
 }
