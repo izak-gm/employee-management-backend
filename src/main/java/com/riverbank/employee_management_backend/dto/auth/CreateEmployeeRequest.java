@@ -2,6 +2,7 @@ package com.riverbank.employee_management_backend.dto.auth;
 
 import com.riverbank.employee_management_backend.enums.Gender;
 import com.riverbank.employee_management_backend.enums.Role;
+import com.riverbank.employee_management_backend.enums.payrolls.EmploymentType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +30,7 @@ public record CreateEmployeeRequest(
       @NotNull
       LocalDate hireDate,
       LocalDate confirmationDate,
+      EmploymentType employment_type,
       UUID departmentId,
       UUID positionId,
       UUID supervisorId

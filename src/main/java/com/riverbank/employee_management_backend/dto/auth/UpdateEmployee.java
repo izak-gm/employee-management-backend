@@ -16,6 +16,7 @@ public record UpdateEmployee(
       String email,
       String phoneNumber,
       Gender gender,
+      String password,
       LocalDate dateOfBirth,
       String nationalId,
       Role role,

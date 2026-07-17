@@ -25,6 +25,7 @@ public class AuthMapper {
           .nationalId(request.nationalId())
           .role(request.role())
           .hireDate(request.hireDate())
+          .employmentType(request.employment_type())
           .confirmationDate(request.confirmationDate())
           .password("")
           .build();
