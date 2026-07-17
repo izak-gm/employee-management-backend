@@ -10,13 +10,13 @@ import java.util.UUID;
 @Service
 public interface DepartmentService {
 
-  DepartmentResponse create(DepartmentRequest request);
+  DepartmentResponse createDepartment(DepartmentRequest request);
 
-  List<DepartmentResponse> findAll();
+  List<DepartmentResponse> findDepartmentsAll();
 
-  DepartmentResponse findById(UUID id);
+  DepartmentResponse findDepartmentById(UUID id);
 
-  DepartmentResponse update(UUID id, DepartmentRequest request);
+  DepartmentResponse updateDepartment(UUID id, DepartmentRequest request);
 
-  void delete(UUID id);
+  void deleteDepartment(UUID id);
 }

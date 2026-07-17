@@ -21,7 +21,7 @@ public class DepartmentServiceImpl implements DepartmentService {
   private final DepartmentMapper mapper;
 
   @Override
-  public DepartmentResponse create(DepartmentRequest request) {
+  public DepartmentResponse createDepartment(DepartmentRequest request) {
     if (repository.existsByName(request.name()))
       throw new ResourceAlreadyExistsException("Department already exists");
 
@@ -29,7 +29,7 @@ public class DepartmentServiceImpl implements DepartmentService {
   }
 
   @Override
-  public List<DepartmentResponse> findAll() {
+  public List<DepartmentResponse> findDepartmentsAll() {
     return repository.findAll()
           .stream()
           .map(mapper::toResponse)
@@ -37,19 +37,19 @@ public class DepartmentServiceImpl implements DepartmentService {
   }
 
   @Override
-  public DepartmentResponse findById(UUID id) {
+  public DepartmentResponse findDepartmentById(UUID id) {
     return mapper.toResponse(getDepartment(id));
   }
 
   @Override
-  public DepartmentResponse update(UUID id, DepartmentRequest request) {
+  public DepartmentResponse updateDepartment(UUID id, DepartmentRequest request) {
     Department department = getDepartment(id);
     mapper.updateEntity(department, request);
     return mapper.toResponse(repository.save(department));
   }
 
   @Override
-  public void delete(UUID id) {
+  public void deleteDepartment(UUID id) {
     Department department = getDepartment(id);
     department.setActive(false);
     repository.save(department);

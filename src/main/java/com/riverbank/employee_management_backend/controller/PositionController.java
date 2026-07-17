@@ -18,35 +18,35 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Tag(name = "Position")
 public class PositionController {
-  private final PositionService service;
+  private final PositionService positionService;
 
   @PostMapping
-  public ResponseEntity<PositionResponse> create(@Valid @RequestBody PositionRequest request) {
+  public ResponseEntity<PositionResponse> createPosition(@Valid @RequestBody PositionRequest request) {
 
     return ResponseEntity.status(HttpStatus.CREATED)
-          .body(service.create(request));
+          .body(positionService.createPosition(request));
   }
 
   @GetMapping
-  public ResponseEntity<List<PositionResponse>> findAll() {
+  public ResponseEntity<List<PositionResponse>> findPositionsAll() {
 
-    return ResponseEntity.ok(service.findAll());
+    return ResponseEntity.ok(positionService.findPositionsAll());
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<PositionResponse> findById(@PathVariable UUID id) {
-    return ResponseEntity.ok(service.findById(id));
+  public ResponseEntity<PositionResponse> findPositionById(@PathVariable UUID id) {
+    return ResponseEntity.ok(positionService.findPositionById(id));
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<PositionResponse> update(@PathVariable UUID id, @Valid @RequestBody PositionRequest request) {
+  public ResponseEntity<PositionResponse> updatePosition(@PathVariable UUID id, @Valid @RequestBody PositionRequest request) {
 
-    return ResponseEntity.ok(service.update(id, request));
+    return ResponseEntity.ok(positionService.updatePosition(id, request));
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> delete(@PathVariable UUID id) {
-    service.delete(id);
+  public ResponseEntity<Void> deletePosition(@PathVariable UUID id) {
+    positionService.deletePosition(id);
     return ResponseEntity.noContent().build();
   }
 }
