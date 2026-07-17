@@ -1,7 +1,5 @@
 package com.riverbank.employee_management_backend.enums;
 
-import com.riverbank.employee_management_backend.enus.Gender;
-
 public enum LeaveType {
 
   ANNUAL(21, false, null),

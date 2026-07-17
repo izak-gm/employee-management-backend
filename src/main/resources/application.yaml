@@ -18,18 +18,18 @@ spring:
   jpa:
     show-sql: false
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: false
         default_schema: public
 
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-    schemas: public
-    baseline-version: 0
-    validate-on-migrate: true
+  #  flyway:
+  #    enabled: true
+  #    baseline-on-migrate: true
+  #    schemas: public
+  #    baseline-version: 0
+  #    validate-on-migrate: true
 
 
 
