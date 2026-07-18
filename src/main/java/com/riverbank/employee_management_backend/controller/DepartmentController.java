@@ -21,33 +21,33 @@ public class DepartmentController {
   private final DepartmentService departmentService;
 
   @PostMapping
-  public ResponseEntity<DepartmentResponse> create(@Valid @RequestBody DepartmentRequest request
+  public ResponseEntity<DepartmentResponse> createDepartment(@Valid @RequestBody DepartmentRequest request
   ) {
     return ResponseEntity.status(HttpStatus.CREATED)
-          .body(departmentService.create(request));
+          .body(departmentService.createDepartment(request));
   }
 
   @GetMapping
-  public ResponseEntity<List<DepartmentResponse>> findAll() {
-    return ResponseEntity.ok(departmentService.findAll());
+  public ResponseEntity<List<DepartmentResponse>> findAllDepartment() {
+    return ResponseEntity.ok(departmentService.findDepartmentsAll());
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<DepartmentResponse> findById(@PathVariable UUID id
+  public ResponseEntity<DepartmentResponse> findDepartmentById(@PathVariable UUID id
   ) {
-    return ResponseEntity.ok(departmentService.findById(id));
+    return ResponseEntity.ok(departmentService.findDepartmentById(id));
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<DepartmentResponse> update(@PathVariable UUID id, @Valid @RequestBody DepartmentRequest request
+  public ResponseEntity<DepartmentResponse> updateDepartment(@PathVariable UUID id, @Valid @RequestBody DepartmentRequest request
   ) {
-    return ResponseEntity.ok(departmentService.update(id, request));
+    return ResponseEntity.ok(departmentService.updateDepartment(id, request));
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> delete(@PathVariable UUID id
+  public ResponseEntity<Void> deleteDepartment(@PathVariable UUID id
   ) {
-    departmentService.delete(id);
+    departmentService.deleteDepartment(id);
     return ResponseEntity.noContent().build();
   }
 }

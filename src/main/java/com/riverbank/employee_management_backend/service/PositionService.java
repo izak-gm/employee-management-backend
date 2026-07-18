@@ -8,13 +8,13 @@ import java.util.UUID;
 
 public interface PositionService {
 
-  PositionResponse create(PositionRequest request);
+  PositionResponse createPosition(PositionRequest request);
 
-  List<PositionResponse> findAll();
+  List<PositionResponse> findPositionsAll();
 
-  PositionResponse findById(UUID id);
+  PositionResponse findPositionById(UUID id);
 
-  PositionResponse update(UUID id, PositionRequest request);
+  PositionResponse updatePosition(UUID id, PositionRequest request);
 
-  void delete(UUID id);
+  void deletePosition(UUID id);
 }

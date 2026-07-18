@@ -19,7 +19,7 @@ public class PositionServiceImpl implements PositionService {
   private final PositionMapper mapper;
 
   @Override
-  public PositionResponse create(PositionRequest request) {
+  public PositionResponse createPosition(PositionRequest request) {
     if (repository.existsByName(request.name()))
       throw new RuntimeException("Position already exists");
     return mapper.toResponse(
@@ -28,7 +28,7 @@ public class PositionServiceImpl implements PositionService {
   }
 
   @Override
-  public List<PositionResponse> findAll() {
+  public List<PositionResponse> findPositionsAll() {
     return repository.findAll()
           .stream()
           .map(mapper::toResponse)
@@ -36,20 +36,20 @@ public class PositionServiceImpl implements PositionService {
   }
 
   @Override
-  public PositionResponse findById(UUID id) {
+  public PositionResponse findPositionById(UUID id) {
 
     return mapper.toResponse(getPosition(id));
   }
 
   @Override
-  public PositionResponse update(UUID id, PositionRequest request) {
+  public PositionResponse updatePosition(UUID id, PositionRequest request) {
     Position position = getPosition(id);
     mapper.updateEntity(position, request);
     return mapper.toResponse(repository.save(position));
   }
 
   @Override
-  public void delete(UUID id) {
+  public void deletePosition(UUID id) {
     Position position = getPosition(id);
     position.setActive(false);
     repository.save(position);
