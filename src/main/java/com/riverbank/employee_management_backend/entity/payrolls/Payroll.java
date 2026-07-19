@@ -21,19 +21,18 @@ import java.util.UUID;
 @Table(
       name = "payroll",
       uniqueConstraints = {
-            @UniqueConstraint(
-                  columnNames = {
-                        "employee_id",
-                        "payrollMonth",
-                        "payrollYear"
-                  }
-            )
+            @UniqueConstraint(columnNames = {"employee_id", "payrollMonth", "payrollYear"})
+      },
+      indexes = {
+            @Index(name = "idx_payroll_employee", columnList = "employee_id"),
+            @Index(name = "idx_payroll_status", columnList = "status"),
+            @Index(name = "idx_payroll_year_month", columnList = "payrollYear, payrollMonth")
       }
 )
 public class Payroll {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -55,8 +54,9 @@ public class Payroll {
   @Column(nullable = false, precision = 19, scale = 2)
   private BigDecimal taxablePay;
 
+  @Builder.Default
   @Column(nullable = false, precision = 19, scale = 2)
-  private BigDecimal totalEarnings;
+  private BigDecimal totalEarnings = BigDecimal.ZERO;
 
   @Column(nullable = false, precision = 19, scale = 2)
   private BigDecimal totalDeductions;
@@ -86,9 +86,29 @@ public class Payroll {
   @Column(nullable = false)
   private PayrollStatus status;
 
-  private String generatedBy;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "generated_by")
+  private Employee generatedBy;
 
-  private String reversedBy;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "approved_by")
+  private Employee approvedBy;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "reversed_by")
+  private Employee reversedBy;
+
+  private LocalDateTime approvedAt;
+
+  private LocalDate paymentDate;
+
+  private String paymentReference;
+
+  @Column(nullable = false, unique = true)
+  private String payrollNumber;
+
+  @Column(length = 500)
+  private String remarks;
 
   private String reversalReason;
 
