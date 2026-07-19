@@ -30,7 +30,7 @@ import java.util.UUID;
 public class Employee implements UserDetails {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
   @Column(nullable = false, unique = true)

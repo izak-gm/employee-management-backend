@@ -15,7 +15,7 @@ import java.util.UUID;
 public class EarningType {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
   @Column(nullable = false, unique = true)
@@ -31,4 +31,7 @@ public class EarningType {
 
   @Builder.Default
   private boolean active = true;
+
+  @Builder.Default
+  private Integer displayOrder = 0;
 }

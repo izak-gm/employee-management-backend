@@ -1,6 +1,5 @@
 package com.riverbank.employee_management_backend.entity.payrolls;
 
-import com.riverbank.employee_management_backend.entity.payrolls.*;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +16,7 @@ import java.util.UUID;
 public class PayrollDeduction {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)

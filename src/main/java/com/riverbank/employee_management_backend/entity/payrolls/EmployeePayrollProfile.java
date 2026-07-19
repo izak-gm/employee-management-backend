@@ -18,7 +18,7 @@ import java.util.UUID;
 public class EmployeePayrollProfile {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
   @OneToOne(fetch = FetchType.LAZY)
@@ -49,16 +49,16 @@ public class EmployeePayrollProfile {
 
   private String bankBranch;
 
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String accountNumber;
 
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String kraPin;
 
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String shifNumber;
 
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String nssfNumber;
 
   @Builder.Default
@@ -66,9 +66,7 @@ public class EmployeePayrollProfile {
   private BigDecimal pensionContribution = BigDecimal.ZERO;
 
   private LocalDate effectiveFrom;
-
-  private LocalDate effectiveTo;
-
+  
   @Builder.Default
   private boolean active = true;
 }

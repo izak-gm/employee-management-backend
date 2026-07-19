@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -18,7 +17,7 @@ import java.util.UUID;
 public class DeductionType {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
   @Column(nullable = false, unique = true)
@@ -45,6 +44,7 @@ public class DeductionType {
 
   private String description;
 
-  @OneToMany(mappedBy = "deductionType")
-  private List<PayrollDeduction> payrollDeductions;
+  @Builder.Default
+  private Integer displayOrder = 0;
+
 }
