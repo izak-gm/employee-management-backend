@@ -68,10 +68,14 @@ public class EmailService {
                           BigDecimal grossPay,
                           BigDecimal totalDeductions,
                           BigDecimal paye,
+                          BigDecimal incomeTax,
+                          BigDecimal personalRelief,
                           BigDecimal nssf,
                           BigDecimal shif,
                           BigDecimal housingLevy,
                           BigDecimal netPay,
+                          BigDecimal statutoryDeductions,
+                          BigDecimal payAfterStatutoryDeductions,
                           byte[] pdfBytes) {
 
     Context ctx = new Context();
@@ -82,10 +86,14 @@ public class EmailService {
     ctx.setVariable("grossPay", formatAmount(grossPay));
     ctx.setVariable("totalDeductions", formatAmount(totalDeductions));
     ctx.setVariable("paye", formatAmount(paye));
+    ctx.setVariable("incomeTax", formatAmount(incomeTax));
+    ctx.setVariable("personalRelief", formatAmount(personalRelief));
     ctx.setVariable("nssf", formatAmount(nssf));
     ctx.setVariable("shif", formatAmount(shif));
     ctx.setVariable("housingLevy", formatAmount(housingLevy));
     ctx.setVariable("netPay", formatAmount(netPay));
+    ctx.setVariable("statutoryDeductions", formatAmount(statutoryDeductions));
+    ctx.setVariable("payAfterStatutoryDeductions", formatAmount(payAfterStatutoryDeductions));
 
     String attachmentName = "Payslip_" + period.replace(" ", "_") + ".pdf";
 

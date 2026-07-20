@@ -36,41 +36,133 @@
         <p>Your payslip for <strong th:text="${period}">March 2025</strong> is ready.
             Please find the PDF attached to this email.</p>
 
-        <!-- Summary -->
-        <div class="summary-box">
-            <div class="summary-row">
-                <span class="label">Employee Number</span>
-                <span class="value" th:text="${employeeNumber}">EMP-001</span>
-            </div>
-            <div class="summary-row">
-                <span class="label">Payroll Number</span>
-                <span class="value" th:text="${payrollNumber}">PAY-2025-03-001</span>
-            </div>
-            <div class="summary-row">
-                <span class="label">Gross Pay</span>
-                <span class="value" th:text="'KES ' + ${grossPay}">KES 100,000</span>
-            </div>
-            <div class="summary-row">
-                <span class="label">Total Deductions</span>
-                <span class="value" th:text="'KES ' + ${totalDeductions}">KES 25,000</span>
-            </div>
-            <div class="summary-row">
-                <span class="label">PAYE</span>
-                <span class="value" th:text="'KES ' + ${paye}">KES 15,000</span>
-            </div>
-            <div class="summary-row">
-                <span class="label">NSSF</span>
-                <span class="value" th:text="'KES ' + ${nssf}">KES 2,160</span>
-            </div>
-            <div class="summary-row">
-                <span class="label">SHIF</span>
-                <span class="value" th:text="'KES ' + ${shif}">KES 2,750</span>
-            </div>
-            <div class="summary-row">
-                <span class="label">Housing Levy</span>
-                <span class="value" th:text="'KES ' + ${housingLevy}">KES 1,500</span>
-            </div>
-        </div>
+        <!-- Payroll Summary -->
+        <table cellpadding="0" cellspacing="0" role="presentation"
+               style="border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin:20px 0;"
+               width="100%">
+
+            <thead>
+            <tr style="background:#1565C0;color:#ffffff;">
+                <th colspan="2" style="padding:14px 16px;text-align:left;font-size:16px;">
+                    Payroll Summary
+                </th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr style="background:#f8fafc;">
+                <td style="padding:12px 16px;font-weight:bold;">Employee Number</td>
+                <td style="padding:12px 16px;text-align:right;font-weight:bold;"
+                    th:text="${employeeNumber}">
+                    EMP-001
+                </td>
+            </tr>
+
+            <tr>
+                <td style="padding:12px 16px;font-weight:bold;">Payroll Number</td>
+                <td style="padding:12px 16px;text-align:right;font-weight:bold;"
+                    th:text="${payrollNumber}">
+                    PAY-001
+                </td>
+            </tr>
+
+            <tr style="background:#f8fafc;">
+                <td style="padding:12px 16px;font-weight:bold;">Basic Pay</td>
+                <td style="padding:12px 16px;text-align:right;font-weight:bold;"
+                    th:text="'KES ' + ${grossPay}">
+                    KES 128,000.00
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2"
+                    style="padding:10px 16px;background:#eef6f6;font-weight:bold;color:#1565C0;">
+                    Deductions
+                </td>
+            </tr>
+
+            <tr>
+                <td style="padding:10px 16px;">SHIF</td>
+                <td style="padding:10px 16px;text-align:right;"
+                    th:text="'KES ' + ${shif}">
+                    KES 3,520.00
+                </td>
+            </tr>
+
+            <tr>
+                <td style="padding:10px 16px;">NSSF</td>
+                <td style="padding:10px 16px;text-align:right;"
+                    th:text="'KES ' + ${nssf}">
+                    KES 2,160.00
+                </td>
+            </tr>
+
+            <tr>
+                <td style="padding:10px 16px;">Housing Levy</td>
+                <td style="padding:10px 16px;text-align:right;"
+                    th:text="'KES ' + ${housingLevy}">
+                    KES 1,920.00
+                </td>
+            </tr>
+
+            <tr style="background:#f8fafc;font-weight:bold;">
+                <td style="padding:10px 16px;">Total Deductions</td>
+                <td style="padding:10px 16px;text-align:right;"
+                    th:text="'KES ' + ${statutoryDeductions}"                    KES 5,440.00
+                </td>
+            </tr>
+
+            <tr>
+                <td style="padding:10px 16px;">Taxable Pay</td>
+                <td style="padding:10px 16px;text-align:right;"
+                    th:text="'KES ' + ${payAfterStatutoryDeductions}"                    KES 122,560.00
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2"
+                    style="padding:10px 16px;background:#eef6f6;font-weight:bold;color:#1565C0;">
+                    PAYE Deductions
+                </td>
+            </tr>
+
+            <tr>
+                <td style="padding:10px 16px;">Income Tax</td>
+                <td style="padding:10px 16px;text-align:right;"
+                    th:text="'KES ' + ${incomeTax}">
+                    KES 31,551.35
+                </td>
+            </tr>
+
+            <tr>
+                <td style="padding:10px 16px;">Personal Relief</td>
+                <td style="padding:10px 16px;text-align:right;"
+                    th:text="'KES ' + ${personalRelief}">
+null
+                </td>
+            </tr>
+
+            <tr style="background:#f8fafc;font-weight:bold;">
+                <td style="padding:10px 16px;">PAYE Total</td>
+                <td style="padding:10px 16px;text-align:right;"
+                    th:text="'KES ' + ${paye}">
+                    KES 29,151.35
+                </td>
+            </tr>
+
+            <tr style="background:#1565C0;color:#ffffff;">
+                <td style="padding:14px 16px;font-size:16px;font-weight:bold;">
+                    Net Pay
+                </td>
+                <td style="padding:14px 16px;text-align:right;font-size:16px;font-weight:bold;"
+                    th:text="'KES ' + ${netPay}">
+                    KES 93,408.65
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
 
         <!-- Net Pay highlight -->
         <div class="net-pay">

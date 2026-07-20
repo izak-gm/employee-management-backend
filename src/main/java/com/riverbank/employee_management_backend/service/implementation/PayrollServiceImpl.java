@@ -1,6 +1,7 @@
 package com.riverbank.employee_management_backend.service.implementation;
 
 import com.riverbank.employee_management_backend.dto.payroll.*;
+import com.riverbank.employee_management_backend.dto.payroll.PAYE.TaxCalculation;
 import com.riverbank.employee_management_backend.entity.Employee;
 import com.riverbank.employee_management_backend.entity.payrolls.*;
 import com.riverbank.employee_management_backend.enums.EmployeeStatus;
@@ -209,13 +210,24 @@ public class PayrollServiceImpl implements PayrollService {
     BigDecimal employerShif = calculator.calculateEmployerShif(grossPay);
     BigDecimal housingLevy = calculator.calculateHousingLevy(grossPay);
 
+
     // 3. Taxable pay & PAYE
     BigDecimal taxablePay = calculator.calculateTaxablePay(
           grossPay, nssf, profile.getPensionContribution()
     );
-    BigDecimal paye = calculator.calculatePaye(taxablePay);
+    TaxCalculation tax = calculator.calculateTax(taxablePay);
 
+    BigDecimal incomeTax = tax.incomeTax();
+    BigDecimal personalRelief = tax.personalRelief();
+    BigDecimal paye = tax.paye();
     // 4. Totals
+//    All deductions shif+nssf+houseLevy
+    BigDecimal statutoryDeductions = nssf
+          .add(shif)
+          .add(housingLevy);
+//    Gross pay - all deductions
+    BigDecimal taxablePayAfterStatutory = grossPay
+          .subtract(statutoryDeductions);
     BigDecimal totalDeductions = paye
           .add(nssf)
           .add(shif)
@@ -233,11 +245,16 @@ public class PayrollServiceImpl implements PayrollService {
           .payrollNumber(generatePayrollNumber(employee.getEmployeeNumber(), month, year))
           .grossPay(grossPay)
           .taxablePay(taxablePay)
+          .incomeTax(incomeTax)
+          .personalRelief(personalRelief)
+          .paye(paye)
           .totalEarnings(grossPay)
           .paye(paye)
           .nssf(nssf)
           .shif(shif)
           .housingLevy(housingLevy)
+          .statutoryDeductions(statutoryDeductions)
+          .payAfterStatutoryDeductions(taxablePayAfterStatutory)
           .employerNssf(employerNssf)
           .employerShif(employerShif)
           .totalDeductions(totalDeductions)
@@ -306,7 +323,8 @@ public class PayrollServiceImpl implements PayrollService {
     try {
       byte[] pdf = payslipPdfService.generate(payroll);
       Employee emp = payroll.getEmployee();
-      emailService.sendPayslip(emp.getEmail(),
+      emailService.sendPayslip(
+            emp.getEmail(),
             emp.getFirstName() + " " + emp.getLastName(),
             period(payroll),
             payroll.getPayrollNumber(),
@@ -314,10 +332,14 @@ public class PayrollServiceImpl implements PayrollService {
             payroll.getGrossPay(),
             payroll.getTotalDeductions(),
             payroll.getPaye(),
+            payroll.getIncomeTax(),
+            payroll.getPersonalRelief(),
             payroll.getNssf(),
             payroll.getShif(),
             payroll.getHousingLevy(),
             payroll.getNetPay(),
+            payroll.getStatutoryDeductions(),
+            payroll.getPayAfterStatutoryDeductions(),
             pdf);
     } catch (Exception e) {
       log.error("Payslip email failed for payroll {}: {}",
@@ -338,4 +360,5 @@ public class PayrollServiceImpl implements PayrollService {
       );
     }
   }
+
 }
