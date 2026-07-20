@@ -67,6 +67,16 @@ public class Payroll {
   @Column(nullable = false, precision = 19, scale = 2)
   private BigDecimal paye;
 
+  //  @Column(nullable = false, precision = 19, scale = 2)
+  private BigDecimal incomeTax;
+
+  //  @Column(nullable = false, precision = 19, scale = 2)
+  private BigDecimal personalRelief;
+
+  private BigDecimal statutoryDeductions;
+
+  private BigDecimal payAfterStatutoryDeductions;
+
   @Column(nullable = false, precision = 19, scale = 2)
   private BigDecimal shif;
 
