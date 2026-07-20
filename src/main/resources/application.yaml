@@ -49,6 +49,9 @@ app:
   frontend-url: http://localhost:5173   # used to build invite/reset links
   invite-token-expiry-hours: 48
   reset-token-expiry-hours: 1
+  mail:
+    from: noreply@riverbank.com
+    from-name: Riverbank HR
 #springdoc:
 #  swagger-ui:
 #    operations-sorter: method
