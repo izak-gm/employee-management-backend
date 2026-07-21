@@ -1,8 +1,8 @@
-INSERT INTO position (id, name, description, active)
-VALUES
-(gen_random_uuid(), 'Software Engineer', 'Software development role', TRUE);
+insert into position (id, name, description, active)
+values
+(gen_random_uuid(), 'Software Engineer', 'Software development role', true);
 
-INSERT INTO employee (
+insert into employee (
     id,
     employee_number,
     first_name,
@@ -17,69 +17,21 @@ INSERT INTO employee (
     hire_date,
     position_id
 )
-VALUES
+values
 (
     gen_random_uuid(),
-    'EMP001',
+    'RBK-0001',
     'System',
     'Administrator',
-    'admin@riverbank.com',
+    'izak@gmail.com',
     '+254700000001',
     'MALE',
-    '$2y$10$BMlmePEe/O7yFmreQAT5feIvLtIlu9aRwRpfbaZNr8kb.RlyvO8ti',
+    '$2y$10$0qvzyTkGZXAWCfsyi4alde9JcyVM83YsEWEj3CUleBGzVS0n7JDN2',
     'SUPERADMIN',
     'ACTIVE',
     'PERMANENT',
-    CURRENT_DATE,
-    NULL
-),
-
-(
-    gen_random_uuid(),
-    'EMP002',
-    'John',
-    'Kamau',
-    'i@riverbank.com',
-    '+254700000002',
-    'MALE',
-    '$2y$10$BMlmePEe/O7yFmreQAT5feIvLtIlu9aRwRpfbaZNr8kb.RlyvO8ti',
-    'EMPLOYEE',
-    'ACTIVE',
-    'PERMANENT',
-    CURRENT_DATE,
-    (SELECT id FROM position WHERE name = 'Software Engineer')
-),
-
-(
-    gen_random_uuid(),
-    'EMP003',
-    'Mary',
-    'Wanjiku',
-    'm@riverbank.com',
-    '+254700000003',
-    'FEMALE',
-    '$2y$10$BMlmePEe/O7yFmreQAT5feIvLtIlu9aRwRpfbaZNr8kb.RlyvO8ti',
-    'EMPLOYEE',
-    'ACTIVE',
-    'PERMANENT',
-    CURRENT_DATE,
-    (SELECT id FROM position WHERE name = 'Software Engineer')
-),
-
-(
-    gen_random_uuid(),
-    'EMP004',
-    'David',
-    'Otieno',
-    'd@riverbank.com',
-    '+254700000004',
-    'MALE',
-    '$2y$10$BMlmePEe/O7yFmreQAT5feIvLtIlu9aRwRpfbaZNr8kb.RlyvO8ti',
-    'EMPLOYEE',
-    'ACTIVE',
-    'PERMANENT',
-    CURRENT_DATE,
-    (SELECT id FROM position WHERE name = 'Software Engineer')
+    current_date,
+    null
 )
 
 ON CONFLICT (email) DO NOTHING;

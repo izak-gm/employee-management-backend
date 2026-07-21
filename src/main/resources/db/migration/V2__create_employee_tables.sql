@@ -50,18 +50,16 @@ CREATE TABLE IF NOT EXISTS  employee (
 
     CONSTRAINT chk_employee_status
         CHECK (status IN (
-            'ACTIVE',
-            'INACTIVE',
-            'SUSPENDED',
-            'TERMINATED'
+   'INVITED',
+  'ACTIVE',
+  'INACTIVE'
         )),
 
 
     CONSTRAINT chk_employee_role
         CHECK (role IN (
-            'ADMIN',
-            'SUPERADMIN',
-            'EMPLOYEE'
+            'SUPERADMIN', 'HR_ADMIN', 'HR_OFFICER', 'PAYROLL_MANAGER', 'FINANCE_MANAGER', 'TECH_LEAD',
+             'SOFTWARE_ENGINEER', 'INTERN'
         ))
 
 );
