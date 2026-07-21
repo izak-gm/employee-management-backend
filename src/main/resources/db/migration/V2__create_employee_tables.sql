@@ -1,33 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- DEPARTMENT
-CREATE TABLE IF NOT EXISTS  department (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(100) NOT NULL UNIQUE,
-    code VARCHAR(20) UNIQUE,
-    description TEXT,
-    active BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- POSITION
-CREATE TABLE  IF NOT EXISTS position (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(100) NOT NULL,
-    code VARCHAR(20),
-    description TEXT,
-    department_id UUID,
-    active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_position_department
-        FOREIGN KEY(department_id)
-        REFERENCES department(id)
-
-);
-
 -- EMPLOYEE
 CREATE TABLE IF NOT EXISTS  employee (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -54,23 +26,43 @@ CREATE TABLE IF NOT EXISTS  employee (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_employee_department
+  CONSTRAINT fk_employee_department
+        FOREIGN KEY (department_id)
+        REFERENCES department(id)
+        ON DELETE SET NULL,
 
-        FOREIGN KEY(department_id)
-
-        REFERENCES department(id),
 
     CONSTRAINT fk_employee_position
+        FOREIGN KEY (position_id)
+        REFERENCES position(id)
+        ON DELETE SET NULL,
 
-        FOREIGN KEY(position_id)
-
-        REFERENCES position(id),
 
     CONSTRAINT fk_employee_supervisor
-
-        FOREIGN KEY(supervisor_id)
-
+        FOREIGN KEY (supervisor_id)
         REFERENCES employee(id)
+        ON DELETE SET NULL,
+
+
+    CONSTRAINT chk_employee_gender
+        CHECK (gender IN ('MALE','FEMALE')),
+
+
+    CONSTRAINT chk_employee_status
+        CHECK (status IN (
+            'ACTIVE',
+            'INACTIVE',
+            'SUSPENDED',
+            'TERMINATED'
+        )),
+
+
+    CONSTRAINT chk_employee_role
+        CHECK (role IN (
+            'ADMIN',
+            'SUPERADMIN',
+            'EMPLOYEE'
+        ))
 
 );
 CREATE INDEX  IF NOT EXISTS  idx_employee_email
