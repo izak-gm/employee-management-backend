@@ -2,8 +2,10 @@ package com.riverbank.employee_management_backend.entity.payrolls;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -32,4 +34,7 @@ public class PayrollEarning {
   private BigDecimal amount;
 
   private String remarks;
+
+  @CreationTimestamp
+  private LocalDateTime createdAt;
 }

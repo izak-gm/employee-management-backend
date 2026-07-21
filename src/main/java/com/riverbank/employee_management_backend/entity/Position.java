@@ -2,7 +2,10 @@ package com.riverbank.employee_management_backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,8 +15,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "position")
+@Table(
+      name = "position",
+      indexes = @Index(name = "idx_position_name", columnList = "name")
+)
 public class Position {
+
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -24,8 +31,15 @@ public class Position {
 
   private String description;
 
+  @Builder.Default
   private boolean active = true;
 
-  @OneToMany(mappedBy = "position")
+  @OneToMany(mappedBy = "position", fetch = FetchType.LAZY)
   private List<Employee> employees;
+
+  @CreationTimestamp
+  private LocalDateTime createdAt;
+
+  @UpdateTimestamp
+  private LocalDateTime updatedAt;
 }
