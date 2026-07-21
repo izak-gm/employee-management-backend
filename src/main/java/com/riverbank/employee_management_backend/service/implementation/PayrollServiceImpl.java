@@ -126,7 +126,7 @@ public class PayrollServiceImpl implements PayrollService {
   public PayrollResponse reversePayroll(UUID payrollId, ReversePayrollRequest request,
                                         Employee reversedBy) {
     Payroll payroll = getByIdOrThrow(payrollId);
-    assertStatus(payroll, PayrollStatus.APPROVED, "reverse");
+    assertStatus(payroll, PayrollStatus.GENERATED, "reverse");
 
     payroll.setStatus(PayrollStatus.REVERSED);
     payroll.setReversalReason(request.reason());
@@ -348,7 +348,7 @@ public class PayrollServiceImpl implements PayrollService {
   }
 
   private Payroll getByIdOrThrow(UUID id) {
-    return payrollRepo.findByIdWithDetails(id)
+    return payrollRepo.findById(id)
           .orElseThrow(() -> new RuntimeException("Payroll not found: " + id));
   }
 

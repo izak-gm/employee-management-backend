@@ -16,8 +16,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Table(
-      name = "position",
-      indexes = @Index(name = "idx_position_name", columnList = "name")
+      name = "department",
+      indexes = @Index(name = "idx_department_name", columnList = "name")
 )
 public class Department {
 
@@ -33,7 +33,7 @@ public class Department {
   @Builder.Default
   private boolean active = true;
 
-  @OneToMany(mappedBy = "position", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "department", fetch = FetchType.LAZY)
   private List<Employee> employees;
 
   @CreationTimestamp
