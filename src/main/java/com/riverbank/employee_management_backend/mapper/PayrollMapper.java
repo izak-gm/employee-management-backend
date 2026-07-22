@@ -10,6 +10,7 @@ import com.riverbank.employee_management_backend.entity.payrolls.PayrollDeductio
 import com.riverbank.employee_management_backend.entity.payrolls.PayrollEarning;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -88,7 +89,7 @@ public class PayrollMapper {
     );
   }
 
-  private List<PayrollEarningResponse> mapEarnings(List<PayrollEarning> earnings) {
+  private List<PayrollEarningResponse> mapEarnings(Collection<PayrollEarning> earnings) {
     if (earnings == null) return Collections.emptyList();
     return earnings.stream().map(e -> new PayrollEarningResponse(
           e.getId(),
@@ -99,7 +100,7 @@ public class PayrollMapper {
     )).toList();
   }
 
-  private List<PayrollDeductionResponse> mapDeductions(List<PayrollDeduction> deductions) {
+  private List<PayrollDeductionResponse> mapDeductions(Collection<PayrollDeduction> deductions) {
     if (deductions == null) return Collections.emptyList();
     return deductions.stream().map(d -> new PayrollDeductionResponse(
           d.getId(),

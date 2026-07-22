@@ -270,7 +270,7 @@ public class PayrollServiceImpl implements PayrollService {
     addEarning(earnings, payroll, "Transport Allowance", profile.getTransportAllowance());
     addEarning(earnings, payroll, "Medical Allowance", profile.getMedicalAllowance());
     addEarning(earnings, payroll, "Other Allowance", profile.getOtherAllowance());
-    payroll.setEarnings(earnings);
+    payroll.setEarnings(new HashSet<>(earnings));
 
     // 7. Build deduction line items
     List<PayrollDeduction> deductions = new ArrayList<>();
@@ -281,7 +281,7 @@ public class PayrollServiceImpl implements PayrollService {
     if (profile.getPensionContribution().compareTo(BigDecimal.ZERO) > 0) {
       addDeduction(deductions, payroll, "Pension", profile.getPensionContribution());
     }
-    payroll.setDeductions(deductions);
+    payroll.setDeductions(new HashSet<>(deductions));
 
     return payroll;
   }
