@@ -29,7 +29,7 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.Month;
 import java.time.format.TextStyle;
-import java.util.List;
+import java.util.Collection;
 import java.util.Locale;
 
 @Slf4j
@@ -129,7 +129,7 @@ public class PayslipPdfService {
     doc.add(t);
   }
 
-  private void addEarnings(Document doc, List<PayrollEarning> earnings, BigDecimal grossPay) {
+  private void addEarnings(Document doc, Collection<PayrollEarning> earnings, BigDecimal grossPay) {
     sectionTitle(doc, "EARNINGS");
 
     Table t = lineItemTable();
@@ -147,7 +147,7 @@ public class PayslipPdfService {
     doc.add(t.setMarginBottom(16));
   }
 
-  private void addDeductions(Document doc, List<PayrollDeduction> deductions,
+  private void addDeductions(Document doc, Collection<PayrollDeduction> deductions,
                              BigDecimal totalDeductions) {
     sectionTitle(doc, "DEDUCTIONS");
 
