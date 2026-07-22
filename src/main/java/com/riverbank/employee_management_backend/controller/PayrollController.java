@@ -31,7 +31,7 @@ public class PayrollController {
 
   @PostMapping("/generate")
   @PreAuthorize("hasAnyRole('SUPERADMIN','HR_ADMIN','PAYROLL_MANAGER')")
-  public ResponseEntity<List<PayrollSummaryResponse>> generate(
+  public ResponseEntity<List<PayrollSummaryResponse>> generatePayroll(
         @Valid @RequestBody GeneratePayrollRequest request,
         @AuthenticationPrincipal Employee currentUser
   ) {
@@ -43,7 +43,7 @@ public class PayrollController {
 
   @PutMapping("/{payrollId}/approve")
   @PreAuthorize("hasAnyRole('SUPERADMIN','HR_ADMIN','PAYROLL_MANAGER')")
-  public ResponseEntity<PayrollResponse> approve(
+  public ResponseEntity<PayrollResponse> approvePayroll(
         @PathVariable UUID payrollId,
         @AuthenticationPrincipal Employee currentUser
   ) {
@@ -68,7 +68,7 @@ public class PayrollController {
 
   @PutMapping("/{payrollId}/reverse")
   @PreAuthorize("hasAnyRole('SUPERADMIN','PAYROLL_MANAGER')")
-  public ResponseEntity<PayrollResponse> reverse(
+  public ResponseEntity<PayrollResponse> reversePayroll(
         @PathVariable UUID payrollId,
         @Valid @RequestBody ReversePayrollRequest request,
         @AuthenticationPrincipal Employee currentUser
@@ -93,7 +93,7 @@ public class PayrollController {
 
   @GetMapping("/{payrollId}")
   @PreAuthorize("hasAnyRole('SUPERADMIN','HR_ADMIN','PAYROLL_MANAGER','FINANCE_MANAGER')")
-  public ResponseEntity<PayrollResponse> getById(@PathVariable UUID payrollId) {
+  public ResponseEntity<PayrollResponse> getPayrollById(@PathVariable UUID payrollId) {
     return ResponseEntity.ok(payrollService.getPayrollById(payrollId));
   }
 
