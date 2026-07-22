@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -26,7 +27,7 @@ public class PayrollProfileController {
 
   @PostMapping
   @PreAuthorize("hasAnyRole('SUPERADMIN', 'HR_ADMIN', 'PAYROLL_MANAGER')")
-  public ResponseEntity<PayrollProfileResponse> create(
+  public ResponseEntity<PayrollProfileResponse> createProfile(
         @Valid @RequestBody PayrollProfileRequest request
   ) {
     return ResponseEntity
@@ -39,7 +40,7 @@ public class PayrollProfileController {
 
   @PutMapping("/{profileId}")
   @PreAuthorize("hasAnyRole('SUPERADMIN', 'HR_ADMIN', 'PAYROLL_MANAGER')")
-  public ResponseEntity<PayrollProfileResponse> update(
+  public ResponseEntity<PayrollProfileResponse> updateProfile(
         @PathVariable UUID profileId,
         @Valid @RequestBody PayrollProfileRequest request
   ) {
@@ -47,14 +48,26 @@ public class PayrollProfileController {
   }
 
   // ── Get by employee ────────────────────────────────────────────────────────
-  // GET /api/v1/payroll/profiles/employee/{employeeId}
+  // GET /api/v1/payroll/profiles/employee/{id}
 
-  @GetMapping("/employee/{employeeId}")
+  @GetMapping("/employee/{id}")
   @PreAuthorize("hasAnyRole('SUPERADMIN', 'HR_ADMIN', 'PAYROLL_MANAGER', 'FINANCE_MANAGER')")
   public ResponseEntity<PayrollProfileResponse> getByEmployee(
-        @PathVariable UUID employeeId
+        @PathVariable UUID id
   ) {
-    return ResponseEntity.ok(payrollProfileService.getProfileByEmployeeId(employeeId));
+    return ResponseEntity.ok(payrollProfileService.getProfileByEmployeeId(id));
+  }
+
+  @GetMapping("/{profileId}")
+  public ResponseEntity<PayrollProfileResponse> getProfileById(
+        @PathVariable UUID profileId) {
+
+    return ResponseEntity.ok(payrollProfileService.getPayrollProfileById(profileId));
+  }
+
+  @GetMapping
+  public ResponseEntity<List<PayrollProfileResponse>> getAllPayrollProfiles() {
+    return ResponseEntity.ok(payrollProfileService.getAllPayrollProfiles());
   }
 
   // ── Deactivate ─────────────────────────────────────────────────────────────
@@ -62,7 +75,7 @@ public class PayrollProfileController {
 
   @DeleteMapping("/{profileId}")
   @PreAuthorize("hasAnyRole('SUPERADMIN', 'HR_ADMIN')")
-  public ResponseEntity<Void> deactivate(@PathVariable UUID profileId) {
+  public ResponseEntity<Void> deactivateProfile(@PathVariable UUID profileId) {
     payrollProfileService.deactivateProfile(profileId);
     return ResponseEntity.noContent().build();
   }
