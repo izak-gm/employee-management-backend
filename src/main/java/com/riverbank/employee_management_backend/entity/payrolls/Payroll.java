@@ -9,7 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -132,12 +132,12 @@ public class Payroll {
         cascade = CascadeType.ALL,
         orphanRemoval = true
   )
-  private List<PayrollEarning> earnings;
+  private Set<PayrollEarning> earnings;
 
   @OneToMany(
         mappedBy = "payroll",
         cascade = CascadeType.ALL,
         orphanRemoval = true
   )
-  private List<PayrollDeduction> deductions;
+  private Set<PayrollDeduction> deductions;
 }
