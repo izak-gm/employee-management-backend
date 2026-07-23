@@ -2,8 +2,10 @@ package com.riverbank.employee_management_backend.repository.payrolls;
 
 import com.riverbank.employee_management_backend.entity.payrolls.EmployeePayrollProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,4 +22,14 @@ public interface EmployeePayrollProfileRepository extends JpaRepository<Employee
   Optional<EmployeePayrollProfile> findByEmployeeIdAndActiveTrue(UUID employeeId);
 
   boolean existsByEmployeeId(UUID employeeId);
+
+  @Query("""
+            SELECT p
+            FROM EmployeePayrollProfile p
+            WHERE p.active = true
+            ORDER BY p.employee.firstName ASC,
+                     p.employee.lastName ASC
+        """)
+  List<EmployeePayrollProfile> findAllActive();
+
 }

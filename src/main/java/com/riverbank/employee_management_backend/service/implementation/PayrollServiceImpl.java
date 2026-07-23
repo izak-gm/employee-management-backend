@@ -126,7 +126,7 @@ public class PayrollServiceImpl implements PayrollService {
   public PayrollResponse reversePayroll(UUID payrollId, ReversePayrollRequest request,
                                         Employee reversedBy) {
     Payroll payroll = getByIdOrThrow(payrollId);
-    assertStatus(payroll, PayrollStatus.GENERATED, "reverse");
+    assertStatus(payroll, PayrollStatus.APPROVED, "reverse");
 
     payroll.setStatus(PayrollStatus.REVERSED);
     payroll.setReversalReason(request.reason());
@@ -191,10 +191,11 @@ public class PayrollServiceImpl implements PayrollService {
 
   private Payroll buildPayroll(Employee employee,
                                EmployeePayrollProfile profile,
-                               int month, int year,
+                               int month,
+                               int year,
                                Employee generatedBy) {
 
-    // 1. Gross pay
+    // 1. Gross Pay
     BigDecimal grossPay = calculator.calculateGrossPay(
           profile.getBasicSalary(),
           profile.getHouseAllowance(),
@@ -203,67 +204,80 @@ public class PayrollServiceImpl implements PayrollService {
           profile.getOtherAllowance()
     );
 
-    // 2. Statutory deductions
+    // 2. Statutory Deductions
     BigDecimal nssf = calculator.calculateEmployeeNssf(profile.getBasicSalary());
     BigDecimal employerNssf = calculator.calculateEmployerNssf(profile.getBasicSalary());
+
     BigDecimal shif = calculator.calculateEmployeeShif(grossPay);
     BigDecimal employerShif = calculator.calculateEmployerShif(grossPay);
+
     BigDecimal housingLevy = calculator.calculateHousingLevy(grossPay);
 
-
-    // 3. Taxable pay & PAYE
+    // 3. Taxable Pay (after statutory deductions + pension)
     BigDecimal taxablePay = calculator.calculateTaxablePay(
-          grossPay, nssf, profile.getPensionContribution()
+          grossPay,
+          nssf,
+          shif,
+          housingLevy,
+          profile.getPensionContribution()
     );
+
+    // 4. PAYE
     TaxCalculation tax = calculator.calculateTax(taxablePay);
 
     BigDecimal incomeTax = tax.incomeTax();
     BigDecimal personalRelief = tax.personalRelief();
     BigDecimal paye = tax.paye();
-    // 4. Totals
-//    All deductions shif+nssf+houseLevy
+
+    // 5. Totals
     BigDecimal statutoryDeductions = nssf
           .add(shif)
           .add(housingLevy);
-//    Gross pay - all deductions
-    BigDecimal taxablePayAfterStatutory = grossPay
-          .subtract(statutoryDeductions);
-    BigDecimal totalDeductions = paye
-          .add(nssf)
-          .add(shif)
-          .add(housingLevy)
-          .add(profile.getPensionContribution());
+
+    BigDecimal payAfterStatutoryDeductions = grossPay.subtract(statutoryDeductions);
+
+    BigDecimal totalDeductions = statutoryDeductions
+          .add(profile.getPensionContribution())
+          .add(paye);
 
     BigDecimal netPay = grossPay.subtract(totalDeductions);
 
-    // 5. Build payroll record
+    // 6. Build Payroll
     Payroll payroll = Payroll.builder()
           .employee(employee)
           .payrollMonth(month)
           .payrollYear(year)
           .payrollDate(LocalDate.now())
           .payrollNumber(generatePayrollNumber(employee.getEmployeeNumber(), month, year))
+
           .grossPay(grossPay)
           .taxablePay(taxablePay)
+
           .incomeTax(incomeTax)
           .personalRelief(personalRelief)
           .paye(paye)
+
           .totalEarnings(grossPay)
-          .paye(paye)
+
           .nssf(nssf)
-          .shif(shif)
-          .housingLevy(housingLevy)
-          .statutoryDeductions(statutoryDeductions)
-          .payAfterStatutoryDeductions(taxablePayAfterStatutory)
           .employerNssf(employerNssf)
+
+          .shif(shif)
           .employerShif(employerShif)
+
+          .housingLevy(housingLevy)
+
+          .statutoryDeductions(statutoryDeductions)
+          .payAfterStatutoryDeductions(payAfterStatutoryDeductions)
+
           .totalDeductions(totalDeductions)
           .netPay(netPay)
+
           .status(PayrollStatus.GENERATED)
           .generatedBy(generatedBy)
           .build();
 
-    // 6. Build earning line items
+    // 7. Earnings
     List<PayrollEarning> earnings = new ArrayList<>();
     addEarning(earnings, payroll, "Basic Salary", profile.getBasicSalary());
     addEarning(earnings, payroll, "House Allowance", profile.getHouseAllowance());
@@ -272,15 +286,17 @@ public class PayrollServiceImpl implements PayrollService {
     addEarning(earnings, payroll, "Other Allowance", profile.getOtherAllowance());
     payroll.setEarnings(new HashSet<>(earnings));
 
-    // 7. Build deduction line items
+    // 8. Deductions
     List<PayrollDeduction> deductions = new ArrayList<>();
     addDeduction(deductions, payroll, "PAYE", paye);
     addDeduction(deductions, payroll, "NSSF", nssf);
     addDeduction(deductions, payroll, "SHIF", shif);
     addDeduction(deductions, payroll, "Housing Levy", housingLevy);
+
     if (profile.getPensionContribution().compareTo(BigDecimal.ZERO) > 0) {
       addDeduction(deductions, payroll, "Pension", profile.getPensionContribution());
     }
+
     payroll.setDeductions(new HashSet<>(deductions));
 
     return payroll;

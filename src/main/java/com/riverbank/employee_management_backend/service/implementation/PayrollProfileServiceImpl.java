@@ -4,6 +4,7 @@ import com.riverbank.employee_management_backend.dto.payroll.PayrollProfileReque
 import com.riverbank.employee_management_backend.dto.payroll.PayrollProfileResponse;
 import com.riverbank.employee_management_backend.entity.Employee;
 import com.riverbank.employee_management_backend.entity.payrolls.EmployeePayrollProfile;
+import com.riverbank.employee_management_backend.exception.ResourceNotFoundException;
 import com.riverbank.employee_management_backend.mapper.PayrollProfileMapper;
 import com.riverbank.employee_management_backend.repository.EmployeeRepository;
 import com.riverbank.employee_management_backend.repository.payrolls.EmployeePayrollProfileRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -128,6 +130,24 @@ public class PayrollProfileServiceImpl implements PayrollProfileService {
           profileId, profile.getEmployee().getEmployeeNumber());
   }
 
+  @Override
+  @Transactional(readOnly = true)
+  public PayrollProfileResponse getPayrollProfileById(UUID profileId) {
+    EmployeePayrollProfile profile = profileRepo.findById(profileId)
+          .orElseThrow(() -> new ResourceNotFoundException(
+                "Payroll profile not found with id: " + profileId));
+
+    return mapper.toResponse(profile);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<PayrollProfileResponse> getAllPayrollProfiles() {
+    return profileRepo.findAllActive()
+          .stream()
+          .map(mapper::toResponse)
+          .toList();
+  }
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   /**
