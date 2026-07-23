@@ -1,6 +1,7 @@
 package com.riverbank.employee_management_backend.util;
 
 import com.riverbank.employee_management_backend.dto.payroll.PAYE.TaxCalculation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.math.RoundingMode;
  * Keep this class pure — no DB calls, no Spring dependencies beyond @Component.
  */
 @Component
+@Slf4j
 public class PayrollCalculator {
 
   private static final RoundingMode ROUND = RoundingMode.HALF_UP;
@@ -87,30 +89,67 @@ public class PayrollCalculator {
 
   public BigDecimal calculateTaxablePay(BigDecimal grossPay,
                                         BigDecimal nssf,
+                                        BigDecimal shif,
+                                        BigDecimal housingLevy,
                                         BigDecimal pensionContribution) {
+
     return grossPay
           .subtract(nssf)
+          .subtract(shif)
+          .subtract(housingLevy)
           .subtract(pensionContribution)
-          .max(BigDecimal.ZERO);
+          .max(BigDecimal.ZERO)
+          .setScale(2, ROUND);
   }
 
   public BigDecimal calculateIncomeTax(BigDecimal taxablePay) {
+
+    log.debug("========== PAYE CALCULATION ==========");
+    log.debug("Taxable Pay: {}", taxablePay);
+
     BigDecimal tax = BigDecimal.ZERO;
     BigDecimal remaining = taxablePay;
+    int level = 1;
 
     for (BigDecimal[] band : PAYE_BANDS) {
-      if (remaining.compareTo(BigDecimal.ZERO) <= 0) break;
 
-      BigDecimal bandSize = (band[0] != null)
-            ? band[0].min(remaining)
+      if (remaining.compareTo(BigDecimal.ZERO) <= 0) {
+        break;
+      }
+
+      BigDecimal limit = band[0];
+      BigDecimal rate = band[1];
+
+      BigDecimal bandSize = (limit != null)
+            ? limit.min(remaining)
             : remaining;
 
-      tax = tax.add(bandSize.multiply(band[1]).setScale(2, ROUND));
+      BigDecimal bandTax = bandSize.multiply(rate).setScale(2, ROUND);
+
+      log.debug(
+            "Band {} | Limit: {} | Rate: {} | Taxable: {} | Tax: {}",
+            level,
+            limit == null ? "Unlimited" : limit,
+            rate,
+            bandSize,
+            bandTax
+      );
+
+      tax = tax.add(bandTax);
       remaining = remaining.subtract(bandSize);
+
+      log.debug("Running Tax: {}", tax);
+      log.debug("Remaining Amount: {}", remaining);
+
+      level++;
     }
 
-    // This returns the whole income tax
-    return tax.setScale(2, ROUND);
+    BigDecimal incomeTax = tax.setScale(2, ROUND);
+
+    log.debug("Gross Income Tax: {}", incomeTax);
+    log.debug("======================================");
+
+    return incomeTax;
   }
 
   // ── Gross Pay ──────────────────────────────────────────────────────────────
@@ -134,13 +173,19 @@ public class PayrollCalculator {
           .max(BigDecimal.ZERO)
           .setScale(2, ROUND);
 
+    log.debug("========== FINAL PAYE ==========");
+    log.debug("Income Tax      : {}", incomeTax);
+    log.debug("Personal Relief : {}", PERSONAL_RELIEF);
+    log.debug("PAYE Payable    : {}", paye);
+    log.debug("================================");
+
     return new TaxCalculation(
           incomeTax,
           PERSONAL_RELIEF,
           paye
     );
   }
-  
+
   public BigDecimal getPersonalRelief() {
     return PERSONAL_RELIEF;
   }
