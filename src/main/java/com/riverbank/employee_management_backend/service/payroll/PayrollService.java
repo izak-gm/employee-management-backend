@@ -47,4 +47,5 @@ public interface PayrollService {
 
   byte[] generateApprovedBatchReport(int month, int year);
 
+  void softDeletePayroll(UUID payrollId, Employee deletedBy);
 }
