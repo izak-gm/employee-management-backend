@@ -1,5 +1,6 @@
 package com.riverbank.employee_management_backend.controller;
 
+import com.riverbank.employee_management_backend.dto.bulk.BulkReverseRequest;
 import com.riverbank.employee_management_backend.dto.payroll.*;
 import com.riverbank.employee_management_backend.entity.Employee;
 import com.riverbank.employee_management_backend.service.payroll.PayrollService;
@@ -163,5 +164,74 @@ public class PayrollController {
                 "attachment; filename=payslip-%d-%02d.pdf".formatted(year, month))
           .contentType(MediaType.APPLICATION_PDF)
           .body(pdf);
+  }
+
+  // ── Admin: Get GENERATED payrolls awaiting approval for a period ───────────
+// GET /api/v1/payroll/generated?month=3&year=2025
+
+  @GetMapping("/generated")
+  @PreAuthorize("hasAnyRole('SUPERADMIN','HR_ADMIN','PAYROLL_MANAGER','FINANCE_MANAGER')")
+  public ResponseEntity<List<PayrollSummaryResponse>> getGeneratedPayrolls(
+        @RequestParam int month,
+        @RequestParam int year
+  ) {
+    return ResponseEntity.ok(payrollService.getGeneratedPayrolls(month, year));
+  }
+
+  @GetMapping("/batch/{year}/{month}/report")
+  @PreAuthorize("hasAnyRole('SUPERADMIN','HR_ADMIN','PAYROLL_MANAGER','FINANCE_MANAGER')")
+  public ResponseEntity<byte[]> downloadBatchReport(@PathVariable int year, @PathVariable int month) {
+    byte[] pdf = payrollService.generateBatchReport(month, year);
+    return ResponseEntity.ok()
+          .header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=payroll-batch-%d-%02d.pdf".formatted(year, month))
+          .contentType(MediaType.APPLICATION_PDF)
+          .body(pdf);
+  }
+
+  @PostMapping("/batch/{year}/{month}/approve")
+  @PreAuthorize("hasAnyRole('SUPERADMIN','HR_ADMIN','PAYROLL_MANAGER')")
+  public ResponseEntity<List<PayrollResponse>> bulkApprove(
+        @PathVariable int year, @PathVariable int month,
+        @AuthenticationPrincipal Employee approver) {
+    return ResponseEntity.ok(payrollService.bulkApprovePayroll(month, year, approver));
+  }
+
+  @PostMapping("/batch/approve")
+  @PreAuthorize("hasAnyRole('SUPERADMIN','HR_ADMIN','PAYROLL_MANAGER')")
+  public ResponseEntity<List<PayrollResponse>> bulkApproveByIds(
+        @RequestBody List<UUID> payrollIds,
+        @AuthenticationPrincipal Employee approver) {
+    return ResponseEntity.ok(payrollService.bulkApprovePayrollByIds(payrollIds, approver));
+  }
+
+  @PostMapping("/batch/reverse")
+  @PreAuthorize("hasAnyRole('SUPERADMIN','PAYROLL_MANAGER')")
+  public ResponseEntity<List<PayrollResponse>> bulkReverse(
+        @Valid @RequestBody BulkReverseRequest request,
+        @AuthenticationPrincipal Employee reversedBy) {
+    return ResponseEntity.ok(
+          payrollService.bulkReversePayroll(request.payrollIds(), request.reason(), reversedBy));
+  }
+
+  @GetMapping("/batch/{year}/{month}/report/approved")
+  @PreAuthorize("hasAnyRole('SUPERADMIN','HR_ADMIN','PAYROLL_MANAGER','FINANCE_MANAGER')")
+  public ResponseEntity<byte[]> downloadApprovedBatchReport(
+        @PathVariable int year, @PathVariable int month) {
+    byte[] pdf = payrollService.generateApprovedBatchReport(month, year);
+    return ResponseEntity.ok()
+          .header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=payroll-approved-%d-%02d.pdf".formatted(year, month))
+          .contentType(MediaType.APPLICATION_PDF)
+          .body(pdf);
+  }
+
+  @DeleteMapping("/{payrollId}")
+  @PreAuthorize("hasAnyRole('SUPERADMIN','HR_ADMIN','PAYROLL_MANAGER')")
+  public ResponseEntity<Void> softDeletePayroll(
+        @PathVariable UUID payrollId,
+        @AuthenticationPrincipal Employee currentUser) {
+    payrollService.softDeletePayroll(payrollId, currentUser);
+    return ResponseEntity.noContent().build();
   }
 }

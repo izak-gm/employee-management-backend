@@ -140,4 +140,8 @@ public class Payroll {
         orphanRemoval = true
   )
   private Set<PayrollDeduction> deductions;
+
+  @Column(nullable = false)
+  @Builder.Default
+  private boolean deleted = false;
 }

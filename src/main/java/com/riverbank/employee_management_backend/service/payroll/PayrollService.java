@@ -34,4 +34,18 @@ public interface PayrollService {
 
   // Download payslip PDF bytes
   byte[] downloadPayslip(UUID payrollId);
+
+  List<PayrollSummaryResponse> getGeneratedPayrolls(int month, int year);
+
+  List<PayrollResponse> bulkApprovePayroll(int month, int year, Employee approver);
+
+  List<PayrollResponse> bulkApprovePayrollByIds(List<UUID> payrollIds, Employee approver);
+
+  List<PayrollResponse> bulkReversePayroll(List<UUID> payrollIds, String reason, Employee reversedBy);
+
+  byte[] generateBatchReport(int month, int year); // PDF or XLSX for review
+
+  byte[] generateApprovedBatchReport(int month, int year);
+
+  void softDeletePayroll(UUID payrollId, Employee deletedBy);
 }
