@@ -61,7 +61,7 @@ public class PayrollServiceImpl implements PayrollService {
 
     for (Employee employee : employees) {
       // Skip if already generated for this period
-      if (payrollRepo.existsByEmployee_IdAndPayrollMonthAndPayrollYear(
+      if (payrollRepo.existsByEmployee_IdAndPayrollMonthAndPayrollYearAndDeletedFalse(
             employee.getId(), month, year)) {
         log.warn("Payroll already exists for {} — {}/{}", employee.getEmployeeNumber(), month, year);
         continue;
@@ -157,14 +157,14 @@ public class PayrollServiceImpl implements PayrollService {
   @Override
   @Transactional(readOnly = true)
   public List<PayrollSummaryResponse> getMyPayrolls(UUID employeeId) {
-    return payrollRepo.findByEmployee_IdOrderByPayrollYearDescPayrollMonthDesc(employeeId)
+    return payrollRepo.findByEmployee_IdAndDeletedFalseOrderByPayrollYearDescPayrollMonthDesc(employeeId)
           .stream().map(mapper::toSummary).toList();
   }
 
   @Override
   @Transactional(readOnly = true)
   public PayrollResponse getMyPayrollForPeriod(UUID employeeId, int month, int year) {
-    return payrollRepo.findByEmployee_IdAndPayrollMonthAndPayrollYear(employeeId, month, year)
+    return payrollRepo.findByEmployee_IdAndPayrollMonthAndPayrollYearAndDeletedFalse(employeeId, month, year)
           .map(mapper::toResponse)
           .orElseThrow(() -> new RuntimeException("Payroll not found for this period"));
   }
@@ -481,7 +481,7 @@ public class PayrollServiceImpl implements PayrollService {
     }
   }
 
-  //  Dowmnload approved payrolls
+  //  Download approved payrolls
   @Override
   @Transactional(readOnly = true)
   public byte[] generateApprovedBatchReport(int month, int year) {
@@ -498,6 +498,22 @@ public class PayrollServiceImpl implements PayrollService {
     } catch (Exception e) {
       throw new RuntimeException("Failed to generate approved batch report", e);
     }
+  }
+
+  @Override
+  @Transactional
+  public void softDeletePayroll(UUID payrollId, Employee deletedBy) {
+    Payroll payroll = getByIdOrThrow(payrollId);
+
+    if (payroll.getStatus() != PayrollStatus.GENERATED) {
+      throw new IllegalStateException(
+            "Only GENERATED payrolls can be deleted. Current status: " + payroll.getStatus());
+    }
+
+    payroll.setDeleted(true);
+    payrollRepo.save(payroll);
+
+    log.info("Payroll {} soft-deleted by {}", payroll.getPayrollNumber(), deletedBy.getEmployeeNumber());
   }
 
 }

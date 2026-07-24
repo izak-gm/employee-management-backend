@@ -225,4 +225,13 @@ public class PayrollController {
           .contentType(MediaType.APPLICATION_PDF)
           .body(pdf);
   }
+
+  @DeleteMapping("/{payrollId}")
+  @PreAuthorize("hasAnyRole('SUPERADMIN','HR_ADMIN','PAYROLL_MANAGER')")
+  public ResponseEntity<Void> softDeletePayroll(
+        @PathVariable UUID payrollId,
+        @AuthenticationPrincipal Employee currentUser) {
+    payrollService.softDeletePayroll(payrollId, currentUser);
+    return ResponseEntity.noContent().build();
+  }
 }
