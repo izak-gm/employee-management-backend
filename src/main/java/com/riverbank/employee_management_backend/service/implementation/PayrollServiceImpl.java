@@ -377,4 +377,127 @@ public class PayrollServiceImpl implements PayrollService {
     }
   }
 
+  // ── Batch Queries ──────────────────────────────────────────────────────────
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<PayrollSummaryResponse> getGeneratedPayrolls(int month, int year) {
+    return payrollRepo.findByMonthAndYear(month, year).stream()
+          .filter(p -> p.getStatus() == PayrollStatus.GENERATED)
+          .map(mapper::toSummary)
+          .toList();
+  }
+
+// ── Bulk Approve ───────────────────────────────────────────────────────────
+
+  @Override
+  @Transactional
+  public List<PayrollResponse> bulkApprovePayroll(int month, int year, Employee approver) {
+    List<Payroll> payrolls = payrollRepo.findByMonthAndYear(month, year).stream()
+          .filter(p -> p.getStatus() == PayrollStatus.GENERATED)
+          .toList();
+
+    if (payrolls.isEmpty()) {
+      throw new IllegalStateException(
+            "No GENERATED payrolls found for %d/%d".formatted(month, year));
+    }
+
+    return approveAll(payrolls, approver);
+  }
+
+  @Override
+  @Transactional
+  public List<PayrollResponse> bulkApprovePayrollByIds(List<UUID> payrollIds, Employee approver) {
+    List<Payroll> payrolls = payrollRepo.findAllById(payrollIds);
+
+    // Fail fast if any requested payroll is missing or not in GENERATED state
+    if (payrolls.size() != payrollIds.size()) {
+      Set<UUID> found = payrolls.stream().map(Payroll::getId).collect(HashSet::new, Set::add, Set::addAll);
+      List<UUID> missing = payrollIds.stream().filter(id -> !found.contains(id)).toList();
+      throw new RuntimeException("Payrolls not found: " + missing);
+    }
+
+    List<Payroll> invalid = payrolls.stream()
+          .filter(p -> p.getStatus() != PayrollStatus.GENERATED)
+          .toList();
+    if (!invalid.isEmpty()) {
+      throw new IllegalStateException(
+            "Cannot approve — payrolls not in GENERATED status: " +
+                  invalid.stream().map(Payroll::getPayrollNumber).toList());
+    }
+
+    return approveAll(payrolls, approver);
+  }
+
+  private List<PayrollResponse> approveAll(List<Payroll> payrolls, Employee approver) {
+    LocalDateTime now = LocalDateTime.now();
+    for (Payroll p : payrolls) {
+      p.setStatus(PayrollStatus.APPROVED);
+      p.setApprovedBy(approver);
+      p.setApprovedAt(now);
+    }
+    return payrollRepo.saveAll(payrolls).stream().map(mapper::toResponse).toList();
+  }
+
+// ── Bulk Reverse ───────────────────────────────────────────────────────────
+
+  @Override
+  @Transactional
+  public List<PayrollResponse> bulkReversePayroll(List<UUID> payrollIds, String reason, Employee reversedBy) {
+    List<Payroll> payrolls = payrollRepo.findAllById(payrollIds);
+
+    List<Payroll> invalid = payrolls.stream()
+          .filter(p -> p.getStatus() != PayrollStatus.APPROVED)
+          .toList();
+    if (!invalid.isEmpty()) {
+      throw new IllegalStateException(
+            "Cannot reverse — payrolls not in APPROVED status: " +
+                  invalid.stream().map(Payroll::getPayrollNumber).toList());
+    }
+
+    LocalDateTime now = LocalDateTime.now();
+    for (Payroll p : payrolls) {
+      p.setStatus(PayrollStatus.REVERSED);
+      p.setReversalReason(reason);
+      p.setReversedBy(reversedBy);
+      p.setReversedAt(now);
+    }
+    return payrollRepo.saveAll(payrolls).stream().map(mapper::toResponse).toList();
+  }
+
+// ── Batch Report (for review before approval) ───────────────────────────────
+
+  @Override
+  @Transactional(readOnly = true)
+  public byte[] generateBatchReport(int month, int year) {
+    List<Payroll> payrolls = payrollRepo.findByMonthAndYear(month, year);
+    if (payrolls.isEmpty()) {
+      throw new RuntimeException("No payrolls found for %d/%d".formatted(month, year));
+    }
+    try {
+      return payslipPdfService.generateBatchReport(payrolls); // new method, see below
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to generate batch payroll report", e);
+    }
+  }
+
+  //  Dowmnload approved payrolls
+  @Override
+  @Transactional(readOnly = true)
+  public byte[] generateApprovedBatchReport(int month, int year) {
+    List<Payroll> payrolls = payrollRepo.findByMonthAndYear(month, year).stream()
+          .filter(p -> p.getStatus() == PayrollStatus.APPROVED)
+          .toList();
+
+    if (payrolls.isEmpty()) {
+      throw new RuntimeException(
+            "No APPROVED payrolls found for %d/%d".formatted(month, year));
+    }
+    try {
+      return payslipPdfService.generateBatchReport(payrolls);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to generate approved batch report", e);
+    }
+  }
+
 }
